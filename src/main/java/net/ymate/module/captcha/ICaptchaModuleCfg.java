@@ -46,6 +46,11 @@ public interface ICaptchaModuleCfg {
     ICaptchaSmsSendProvider getCaptchaSmsSendProvider();
 
     /**
+     * @return 邮件验证码发送服务提供者类, 默认值: 空
+     */
+    ICaptchaMailSendProvider getCaptchaMailSendProvider();
+
+    /**
      * @return 身份令牌标识扩展处理器, 默认值: 空
      */
     ICaptchaTokenProcessor getCaptchaTokenProcessor();
@@ -59,6 +64,11 @@ public interface ICaptchaModuleCfg {
      * @return 相同令牌标识范围的短信验证码重复发送的是时间间隔(秒), 默认为120秒
      */
     int getCaptchaSmsSendTimeInterval();
+
+    /**
+     * @return 相同令牌标识范围的邮件验证码重复发送的是时间间隔(秒), 默认为300秒
+     */
+    int getCaptchaMailSendTimeInterval();
 
     /**
      * @return 设置在达到指定错误次数上限后开启验证码, 默认为0则表示不开启错误记数特性

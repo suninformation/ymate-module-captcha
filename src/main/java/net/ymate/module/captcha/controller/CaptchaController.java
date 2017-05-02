@@ -21,6 +21,7 @@ import net.ymate.framework.webmvc.WebResult;
 import net.ymate.module.captcha.*;
 import net.ymate.platform.core.lang.PairObject;
 import net.ymate.platform.core.util.RuntimeUtils;
+import net.ymate.platform.validation.validate.VEmail;
 import net.ymate.platform.validation.validate.VLength;
 import net.ymate.platform.validation.validate.VNumeric;
 import net.ymate.platform.validation.validate.VRequried;
@@ -95,6 +96,26 @@ public class CaptchaController {
         return WebResult.CODE(0).dataAttr("matched", ICaptcha.Status.MATCHED.equals(Captcha.get().validate(tokenId, token, false))).toJSON();
     }
 
+    private CaptchaTokenBean __doGetCaptchaToken(ICaptchaModuleCfg captchaCfg, String tokenId, boolean isNeedSend, boolean isSms) throws Exception {
+        CaptchaTokenBean _tokenBean = captchaCfg.getCaptchaStorageAdapter().load(tokenId);
+        if (_tokenBean == null || (captchaCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() >= captchaCfg.getTokenTimeout())) {
+            Captcha.get().generate(tokenId);
+            _tokenBean = captchaCfg.getCaptchaStorageAdapter().load(tokenId);
+            //
+            if (_tokenBean != null) {
+                isNeedSend = true;
+                if (captchaCfg.isDevelopMode()) {
+                    _LOG.debug("Generate captcha['" + tokenId + "']: " + _tokenBean.getToken());
+                }
+            }
+        }
+        int interval = isSms ? captchaCfg.getCaptchaSmsSendTimeInterval() : captchaCfg.getCaptchaMailSendTimeInterval();
+        if (_tokenBean != null && (isNeedSend || System.currentTimeMillis() - _tokenBean.getCreateTime() > interval * 1000)) {
+            return _tokenBean;
+        }
+        return null;
+    }
+
     /**
      * @param tokenId 身份令牌标识ID, 用于区分不同客户端及数据存储范围, 默认值: sms
      * @param mobile  手机号码
@@ -122,19 +143,8 @@ public class CaptchaController {
                     }
                 }
             }
-            CaptchaTokenBean _tokenBean = _captchaCfg.getCaptchaStorageAdapter().load(tokenId);
-            if (_tokenBean == null || (_captchaCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() >= _captchaCfg.getTokenTimeout())) {
-                Captcha.get().generate(tokenId);
-                _tokenBean = _captchaCfg.getCaptchaStorageAdapter().load(tokenId);
-                //
-                if (_tokenBean != null) {
-                    _needSend = true;
-                    if (_captchaCfg.isDevelopMode()) {
-                        _LOG.debug("Generate captcha['" + tokenId + "']: " + _tokenBean.getToken());
-                    }
-                }
-            }
-            if (_tokenBean != null && (_needSend || System.currentTimeMillis() - _tokenBean.getCreateTime() > _captchaCfg.getCaptchaSmsSendTimeInterval() * 1000)) {
+            CaptchaTokenBean _tokenBean = __doGetCaptchaToken(_captchaCfg, tokenId, _needSend, true);
+            if (_tokenBean != null) {
                 try {
                     if (!_captchaCfg.isDevelopMode()) {
                         _sender.send(mobile, _tokenBean.getToken());
@@ -143,6 +153,40 @@ public class CaptchaController {
                     return WebResult.SUCCESS().toJSON();
                 } catch (Exception e) {
                     _LOG.warn("An exception occurred at send sms to " + mobile, RuntimeUtils.unwrapThrow(e));
+                }
+            } else {
+                return WebResult.CODE(ErrorCode.REQUEST_OPERATION_FORBIDDEN).toJSON();
+            }
+        }
+        return WebResult.CODE(ErrorCode.INTERNAL_SYSTEM_ERROR).toJSON();
+    }
+
+    /**
+     * @param tokenId 身份令牌标识ID, 用于区分不同客户端及数据存储范围, 默认值: sms
+     * @param email   邮箱地址
+     * @return 发送邮件验证码, ret=0表示发送成功, ret=-1表示参数验证错误, ret=-6表示发送频率过快或其它消息, ret=-50表示发送异常
+     * @throws Exception 可能产生的任何异常
+     */
+    @RequestMapping(value = "/mail_code", method = Type.HttpMethod.POST)
+    public IView mailCode(@VLength(max = 32)
+                          @RequestParam(defaultValue = ICaptcha.Const.TOKEN_MAIL) String tokenId,
+
+                          @VRequried
+                          @VEmail
+                          @RequestParam String email) throws Exception {
+        ICaptchaModuleCfg _captchaCfg = Captcha.get().getModuleCfg();
+        ICaptchaMailSendProvider _sender = _captchaCfg.getCaptchaMailSendProvider();
+        if (_sender != null) {
+            CaptchaTokenBean _tokenBean = __doGetCaptchaToken(_captchaCfg, tokenId, false, false);
+            if (_tokenBean != null) {
+                try {
+                    if (!_captchaCfg.isDevelopMode()) {
+                        _sender.send(email, _tokenBean.getToken());
+                    }
+                    //
+                    return WebResult.SUCCESS().toJSON();
+                } catch (Exception e) {
+                    _LOG.warn("An exception occurred at send mail to " + email, RuntimeUtils.unwrapThrow(e));
                 }
             } else {
                 return WebResult.CODE(ErrorCode.REQUEST_OPERATION_FORBIDDEN).toJSON();

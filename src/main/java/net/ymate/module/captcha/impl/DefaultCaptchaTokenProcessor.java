@@ -51,7 +51,7 @@ public class DefaultCaptchaTokenProcessor implements ICaptchaTokenProcessor {
     }
 
     public boolean isNeedSkipValidation(String tokenId) {
-        if (StringUtils.startsWithIgnoreCase(tokenId, ICaptcha.Const.TOKEN_SMS)) {
+        if (StringUtils.startsWithIgnoreCase(tokenId, ICaptcha.Const.TOKEN_SMS) || StringUtils.startsWithIgnoreCase(tokenId, ICaptcha.Const.TOKEN_MAIL)) {
             return false;
         }
         String _cacheKey = __buildCacheKey(tokenId);
@@ -67,7 +67,7 @@ public class DefaultCaptchaTokenProcessor implements ICaptchaTokenProcessor {
     }
 
     public void resetWrongTimes(String tokenId) {
-        if (!StringUtils.startsWithIgnoreCase(tokenId, ICaptcha.Const.TOKEN_SMS)) {
+        if (!StringUtils.startsWithIgnoreCase(tokenId, ICaptcha.Const.TOKEN_SMS) && !StringUtils.startsWithIgnoreCase(tokenId, ICaptcha.Const.TOKEN_MAIL)) {
             __tokenWrongTimesCache.remove(__buildCacheKey(tokenId));
             // 同时移除写入Cookie的内容
             CookieHelper.bind(WebMVC.get()).removeCookie("captcha_" + StringUtils.trimToEmpty(tokenId));

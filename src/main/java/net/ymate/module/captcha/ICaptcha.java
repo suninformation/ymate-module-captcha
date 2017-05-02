@@ -125,5 +125,7 @@ public interface ICaptcha {
     interface Const {
 
         String TOKEN_SMS = "sms";
+
+        String TOKEN_MAIL = "mail";
     }
 }

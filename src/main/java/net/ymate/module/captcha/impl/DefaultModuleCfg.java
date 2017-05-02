@@ -42,9 +42,13 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
 
     private ICaptchaSmsSendProvider captchaSmsSendProvider;
 
+    private ICaptchaMailSendProvider captchaMailSendProvider;
+
     private String captchaSmsContentTemplate;
 
     private int captchaSmsSendTimeInterval;
+
+    private int captchaMailSendTimeInterval;
 
     private int __needCaptchaWrongTimes;
 
@@ -98,6 +102,8 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
         //
         captchaTokenProcessor = ClassUtils.impl(_moduleCfgs.get("token_processor_class"), ICaptchaTokenProcessor.class, this.getClass());
         //
+        captchaMailSendProvider = ClassUtils.impl(_moduleCfgs.get("mail_send_provider_class"), ICaptchaMailSendProvider.class, this.getClass());
+        //
         captchaSmsSendProvider = ClassUtils.impl(_moduleCfgs.get("sms_send_provider_class"), ICaptchaSmsSendProvider.class, this.getClass());
         if (captchaSmsSendProvider != null) {
             captchaSmsContentTemplate = StringUtils.defaultIfBlank(_moduleCfgs.get("sms_content_template"), "${captcha}");
@@ -106,6 +112,11 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
         captchaSmsSendTimeInterval = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("sms_send_time_interval"), "120")).toIntValue();
         if (captchaSmsSendTimeInterval <= 0) {
             captchaSmsSendTimeInterval = 120;
+        }
+        //
+        captchaMailSendTimeInterval = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("mail_send_time_interval"), "300")).toIntValue();
+        if (captchaMailSendTimeInterval <= 0) {
+            captchaMailSendTimeInterval = 300;
         }
         //
         __needCaptchaWrongTimes = BlurObject.bind(_moduleCfgs.get("need_captcha_wrong_times")).toIntValue();
@@ -207,6 +218,10 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
         return captchaSmsSendProvider;
     }
 
+    public ICaptchaMailSendProvider getCaptchaMailSendProvider() {
+        return captchaMailSendProvider;
+    }
+
     public ICaptchaTokenProcessor getCaptchaTokenProcessor() {
         return captchaTokenProcessor;
     }
@@ -217,6 +232,10 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
 
     public int getCaptchaSmsSendTimeInterval() {
         return captchaSmsSendTimeInterval;
+    }
+
+    public int getCaptchaMailSendTimeInterval() {
+        return captchaMailSendTimeInterval;
     }
 
     public int getNeedCaptchaWrongTimes() {
