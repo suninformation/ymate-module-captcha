@@ -48,6 +48,23 @@
     > - `ret=-6` 表示发送频率过快或其它消息
     > - `ret=-50` 表示发送异常
 
+- 发送邮件验证码
+
+        http://<你的域名>/captcha/mail_code?tokenId=<TOKEN_ID>&email=<EMAIL>
+
+    > tokenId：令牌标识ID, 采用`mail`作为前缀，区别于图片验证码，可选参数；
+    >
+    > email：邮件地址，必选参数；
+    
+    返回值说明：
+    
+        {ret: 0, msg: "..."}
+    
+    > - `ret=0` 表示发送成功
+    > - `ret=-1` 表示参数验证错误
+    > - `ret=-6` 表示发送频率过快或其它消息
+    > - `ret=-50` 表示发送异常
+
 - 检查验证码是否合法
 
         http://<你的域名>/captcha/match?tokenId=<TOKEN_ID>&token=<TOKEN>
@@ -77,6 +94,12 @@
     
     # 身份令牌标识扩展处理器, 默认值: 空
     ymp.configs.module.captcha.token_processor_class=
+    
+    # 邮件验证码发送服务提供者类, 默认值: 空
+    ymp.configs.module.captcha.mail_send_provider_class=
+    
+    # 相同令牌标识范围的邮件验证码重复发送的是时间间隔(秒), 默认值: 300秒
+    ymp.configs.module.captcha.mail_send_time_interval=
     
     # 手机短信验证码发送服务提供者类, 默认值: 空
     ymp.configs.module.captcha.sms_send_provider_class=
