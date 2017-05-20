@@ -1,6 +1,12 @@
-### Captcha
+#### YMP-Captcha:
 
-基于YMP框架实现的验证码模块，支持图片、邮件和短信三种验证类型，采用`@VCaptcha`注解方式进行验证，配置简单、灵活，可自定义扩展；
+> 验证码模块；
+> 
+> - 支持图片、邮件和短信三种验证类型；
+> - 支持多作用域验证生成；
+> - 支持`debug`模式，该模式下短信不会被发送；
+> - 支持根据限定条件判断是否启用验证码，如：请求n次后需要填写验证码；
+> - 采用`@VCaptcha`注解验证，配置简单、灵活，可自定义扩展；
 
 #### Maven包依赖
 
@@ -21,7 +27,7 @@
 
 > **注**: 推荐将YMP框架更新至最新(Maven中央库发布的版本较缓), [请前往下载最新代码](https://github.com/suninformation/ymate-platform-v2)  
 
-### 使用方法说明
+#### 使用方法说明
 
 - 获取验证码图片
 
@@ -77,7 +83,51 @@
 
         {ret: 0, matched: true|false}
 
-### 模块配置参数说明
+#### 示例代码：
+
+- 验证码注解`@VCaptcha`的使用
+    
+        @RequestMapping(value = "/login", method = Type.HttpMethod.POST)
+        public IView __doLogin(@VCaptcha(invalid = true)
+                               @RequestParam String captcha, // 验证码
+                               
+                               @VRequried
+                               @VMobile
+                               @RequestParam String mobile, // 手机号码
+                                
+                               @VRequried
+                               @VCaptcha(tokenId = ICaptcha.Const.TOKEN_SMS)
+                               @RequestParam String smscode, // 短信验证码
+    
+                               @VRequried
+                               @RequestParam String passwd, // 登录密码
+    
+                               @RequestParam(Optional.REDIRECT_URL) String redirectUrl) throws Exception {
+            // ...... 省略
+            return WebResult.SUCCESS().toJSON();
+        }
+
+- 验证码相关方法调用
+
+        // 生成作用域为user.login的验证码
+        String _code = Captcha.get().generate("user.login");
+        
+        // 销毁作用域为user.login的验证码
+        Captcha.get().invalidate("user.login");
+        
+        // 判断是否开启错误记数，开启后将支持跳过参数验证
+        Captcha.get().isWrongTimesEnabled();
+        
+        // 判断作用域为user.login的验证码是否允许忽略
+        Captcha.get().isValidationNeedSkip("user.login");
+        
+        // 重置作用域为user.login的验证码错误计数器
+        Captcha.get().resetWrongTimes("user.login");
+        
+        // 验证作用域为user.login的验证码是否匹配以及验证后是否使其失效
+        Captcha.get().validate("user.login", _code, true);
+
+#### 模块配置参数说明
 
     #-------------------------------------
     # module.captcha 模块初始化参数
