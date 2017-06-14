@@ -25,8 +25,6 @@
         # 框架自动扫描的包路径集合，多个包名之间用'|'分隔，默认已包含net.ymate.platform包，其子包也将被扫描
         ymp.autoscan_packages=net.ymate
 
-> **注**: 推荐将YMP框架更新至最新(Maven中央库发布的版本较缓), [请前往下载最新代码](https://github.com/suninformation/ymate-platform-v2)  
-
 #### 使用方法说明
 
 - 获取验证码图片
