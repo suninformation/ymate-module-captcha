@@ -43,12 +43,12 @@ public interface ICaptchaModuleCfg {
     /**
      * @return 手机短信验证码发送服务提供者类, 默认值: 空
      */
-    ICaptchaSmsSendProvider getCaptchaSmsSendProvider();
+    ICaptchaSendProvider getCaptchaSmsSendProvider();
 
     /**
      * @return 邮件验证码发送服务提供者类, 默认值: 空
      */
-    ICaptchaMailSendProvider getCaptchaMailSendProvider();
+    ICaptchaSendProvider getCaptchaMailSendProvider();
 
     /**
      * @return 身份令牌标识扩展处理器, 默认值: 空

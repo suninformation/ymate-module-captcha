@@ -16,10 +16,10 @@
 package net.ymate.module.captcha;
 
 /**
- * @author 刘镇 (suninformation@163.com) on 17/4/6 上午11:37
+ * @author 刘镇 (suninformation@163.com) on 17/5/2 上午10:46
  * @version 1.0
  */
-public interface ICaptchaSmsSendProvider {
+public interface ICaptchaSendProvider {
 
     /**
      * 初始化
@@ -30,11 +30,11 @@ public interface ICaptchaSmsSendProvider {
     void init(ICaptcha owner) throws Exception;
 
     /**
-     * 发送短信验证码
+     * 发送验证码
      *
-     * @param mobile  手机号码
+     * @param target  目标
      * @param captcha 验证码
      * @throws Exception 可能产生的任何异常
      */
-    void send(String mobile, String captcha) throws Exception;
+    void send(String target, String captcha) throws Exception;
 }

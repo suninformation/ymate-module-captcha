@@ -116,6 +116,46 @@ public class CaptchaController {
         return null;
     }
 
+    private IView __doSendCode(String type, String tokenId, String target) throws Exception {
+        ICaptchaModuleCfg _captchaCfg = Captcha.get().getModuleCfg();
+        ICaptchaSendProvider _sender = null;
+        boolean _isSms = false;
+        if (StringUtils.equalsIgnoreCase(type, ICaptcha.Const.TOKEN_SMS)) {
+            _isSms = true;
+            _sender = _captchaCfg.getCaptchaSmsSendProvider();
+        } else if (StringUtils.equalsIgnoreCase(type, ICaptcha.Const.TOKEN_MAIL)) {
+            _sender = _captchaCfg.getCaptchaMailSendProvider();
+        }
+        if (_sender != null) {
+            boolean _needSend = false;
+            ICaptchaTokenProcessor _processor = _captchaCfg.getCaptchaTokenProcessor();
+            if (_processor != null) {
+                PairObject<Integer, String> _allowSend = _processor.isAllowCaptchaCodeSend(type, tokenId, target);
+                if (_allowSend != null) {
+                    _needSend = _allowSend.getKey() == 0;
+                    if (!_needSend) {
+                        return WebResult.CODE(ErrorCode.REQUEST_OPERATION_FORBIDDEN).msg(_allowSend.getValue()).toJSON();
+                    }
+                }
+            }
+            CaptchaTokenBean _tokenBean = __doGetCaptchaToken(_captchaCfg, tokenId, _needSend, _isSms);
+            if (_tokenBean != null) {
+                try {
+                    if (!_captchaCfg.isDevelopMode()) {
+                        _sender.send(target, _tokenBean.getToken());
+                    }
+                    //
+                    return WebResult.SUCCESS().toJSON();
+                } catch (Exception e) {
+                    _LOG.warn("An exception occurred at send to " + target, RuntimeUtils.unwrapThrow(e));
+                }
+            } else {
+                return WebResult.CODE(ErrorCode.REQUEST_OPERATION_FORBIDDEN).toJSON();
+            }
+        }
+        return WebResult.CODE(ErrorCode.INTERNAL_SYSTEM_ERROR).toJSON();
+    }
+
     /**
      * @param tokenId 身份令牌标识ID, 用于区分不同客户端及数据存储范围, 默认值: sms
      * @param mobile  手机号码
@@ -129,36 +169,8 @@ public class CaptchaController {
                          @VRequried
                          @VMobile
                          @RequestParam String mobile) throws Exception {
-        ICaptchaModuleCfg _captchaCfg = Captcha.get().getModuleCfg();
-        ICaptchaSmsSendProvider _sender = _captchaCfg.getCaptchaSmsSendProvider();
-        if (_sender != null) {
-            boolean _needSend = false;
-            ICaptchaTokenProcessor _processor = _captchaCfg.getCaptchaTokenProcessor();
-            if (_processor != null) {
-                PairObject<Integer, String> _allowSmsSend = _processor.isAllowSmsCodeSend(tokenId, mobile);
-                if (_allowSmsSend != null) {
-                    _needSend = _allowSmsSend.getKey() == 0;
-                    if (!_needSend) {
-                        return WebResult.CODE(ErrorCode.REQUEST_OPERATION_FORBIDDEN).msg(_allowSmsSend.getValue()).toJSON();
-                    }
-                }
-            }
-            CaptchaTokenBean _tokenBean = __doGetCaptchaToken(_captchaCfg, tokenId, _needSend, true);
-            if (_tokenBean != null) {
-                try {
-                    if (!_captchaCfg.isDevelopMode()) {
-                        _sender.send(mobile, _tokenBean.getToken());
-                    }
-                    //
-                    return WebResult.SUCCESS().toJSON();
-                } catch (Exception e) {
-                    _LOG.warn("An exception occurred at send sms to " + mobile, RuntimeUtils.unwrapThrow(e));
-                }
-            } else {
-                return WebResult.CODE(ErrorCode.REQUEST_OPERATION_FORBIDDEN).toJSON();
-            }
-        }
-        return WebResult.CODE(ErrorCode.INTERNAL_SYSTEM_ERROR).toJSON();
+
+        return __doSendCode(ICaptcha.Const.TOKEN_SMS, tokenId, mobile);
     }
 
     /**
@@ -174,24 +186,7 @@ public class CaptchaController {
                           @VRequried
                           @VEmail
                           @RequestParam String email) throws Exception {
-        ICaptchaModuleCfg _captchaCfg = Captcha.get().getModuleCfg();
-        ICaptchaMailSendProvider _sender = _captchaCfg.getCaptchaMailSendProvider();
-        if (_sender != null) {
-            CaptchaTokenBean _tokenBean = __doGetCaptchaToken(_captchaCfg, tokenId, false, false);
-            if (_tokenBean != null) {
-                try {
-                    if (!_captchaCfg.isDevelopMode()) {
-                        _sender.send(email, _tokenBean.getToken());
-                    }
-                    //
-                    return WebResult.SUCCESS().toJSON();
-                } catch (Exception e) {
-                    _LOG.warn("An exception occurred at send mail to " + email, RuntimeUtils.unwrapThrow(e));
-                }
-            } else {
-                return WebResult.CODE(ErrorCode.REQUEST_OPERATION_FORBIDDEN).toJSON();
-            }
-        }
-        return WebResult.CODE(ErrorCode.INTERNAL_SYSTEM_ERROR).toJSON();
+
+        return __doSendCode(ICaptcha.Const.TOKEN_MAIL, tokenId, email);
     }
 }

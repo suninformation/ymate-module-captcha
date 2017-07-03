@@ -47,9 +47,10 @@ public interface ICaptchaTokenProcessor {
     void resetWrongTimes(String tokenId);
 
     /**
+     * @param type    验证码类型
      * @param tokenId 令牌标识ID
-     * @param mobile  手机号码
-     * @return 判断指定令牌标识和手机号码是否允许发送短信码，返回值: &lt;状态码, 提示信息&gt;
+     * @param target  手机号码或邮件地址
+     * @return 判断指定令牌标识的手机号码或邮件地址是否允许发送验证码，返回值: &lt;状态码, 提示信息&gt;
      */
-    PairObject<Integer, String> isAllowSmsCodeSend(String tokenId, String mobile);
+    PairObject<Integer, String> isAllowCaptchaCodeSend(String type, String tokenId, String target);
 }

@@ -40,9 +40,9 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
 
     private ICaptchaTokenProcessor captchaTokenProcessor;
 
-    private ICaptchaSmsSendProvider captchaSmsSendProvider;
+    private ICaptchaSendProvider captchaSmsSendProvider;
 
-    private ICaptchaMailSendProvider captchaMailSendProvider;
+    private ICaptchaSendProvider captchaMailSendProvider;
 
     private String captchaSmsContentTemplate;
 
@@ -102,9 +102,9 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
         //
         captchaTokenProcessor = ClassUtils.impl(_moduleCfgs.get("token_processor_class"), ICaptchaTokenProcessor.class, this.getClass());
         //
-        captchaMailSendProvider = ClassUtils.impl(_moduleCfgs.get("mail_send_provider_class"), ICaptchaMailSendProvider.class, this.getClass());
+        captchaMailSendProvider = ClassUtils.impl(_moduleCfgs.get("mail_send_provider_class"), ICaptchaSendProvider.class, this.getClass());
         //
-        captchaSmsSendProvider = ClassUtils.impl(_moduleCfgs.get("sms_send_provider_class"), ICaptchaSmsSendProvider.class, this.getClass());
+        captchaSmsSendProvider = ClassUtils.impl(_moduleCfgs.get("sms_send_provider_class"), ICaptchaSendProvider.class, this.getClass());
         if (captchaSmsSendProvider != null) {
             captchaSmsContentTemplate = StringUtils.defaultIfBlank(_moduleCfgs.get("sms_content_template"), "${captcha}");
         }
@@ -214,11 +214,11 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
         return captchaStorageAdapter;
     }
 
-    public ICaptchaSmsSendProvider getCaptchaSmsSendProvider() {
+    public ICaptchaSendProvider getCaptchaSmsSendProvider() {
         return captchaSmsSendProvider;
     }
 
-    public ICaptchaMailSendProvider getCaptchaMailSendProvider() {
+    public ICaptchaSendProvider getCaptchaMailSendProvider() {
         return captchaMailSendProvider;
     }
 

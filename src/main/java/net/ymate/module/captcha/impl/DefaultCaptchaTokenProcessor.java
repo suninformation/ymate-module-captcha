@@ -74,7 +74,7 @@ public class DefaultCaptchaTokenProcessor implements ICaptchaTokenProcessor {
         }
     }
 
-    public PairObject<Integer, String> isAllowSmsCodeSend(String tokenId, String mobile) {
+    public PairObject<Integer, String> isAllowCaptchaCodeSend(String type, String tokenId, String target) {
         return null;
     }
 }
