@@ -26,6 +26,8 @@ import java.io.Serializable;
  */
 public class CaptchaTokenBean implements Serializable {
 
+    private String target;
+
     private String token;
 
     private ICaptcha.Status status;
@@ -39,6 +41,15 @@ public class CaptchaTokenBean implements Serializable {
         this.token = token;
         this.status = ICaptcha.Status.NORMAL;
         this.createTime = System.currentTimeMillis();
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public CaptchaTokenBean setTarget(String target) {
+        this.target = target;
+        return this;
     }
 
     public String getToken() {

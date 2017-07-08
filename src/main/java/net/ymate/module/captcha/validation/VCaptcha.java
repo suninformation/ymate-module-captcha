@@ -32,6 +32,11 @@ public @interface VCaptcha {
     String tokenId() default "";
 
     /**
+     * @return 目标参数名称(当验证手机号码或邮件地址时使用)
+     */
+    String targetName() default "";
+
+    /**
      * @return 方法被调用后是否使Token失效
      */
     boolean invalid() default false;

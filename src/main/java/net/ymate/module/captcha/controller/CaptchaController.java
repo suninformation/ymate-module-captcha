@@ -82,6 +82,7 @@ public class CaptchaController {
 
     /**
      * @param tokenId 身份令牌标识ID, 用于区分不同客户端及数据存储范围
+     * @param target  目标(当验证手机号码或邮件地址时使用)
      * @param token   预验证的令牌值
      * @return 返回判断token是否匹配的验证结果（主要用于客户端验证）
      * @throws Exception 可能产生的任何异常
@@ -90,16 +91,18 @@ public class CaptchaController {
     public IView match(@VLength(max = 32)
                        @RequestParam String tokenId,
 
+                       @RequestParam String target,
+
                        @VLength(max = 10)
                        @RequestParam String token) throws Exception {
 
-        return WebResult.CODE(0).dataAttr("matched", ICaptcha.Status.MATCHED.equals(Captcha.get().validate(tokenId, token, false))).toJSON();
+        return WebResult.CODE(0).dataAttr("matched", ICaptcha.Status.MATCHED.equals(Captcha.get().validate(tokenId, target, token, false))).toJSON();
     }
 
-    private CaptchaTokenBean __doGetCaptchaToken(ICaptchaModuleCfg captchaCfg, String tokenId, boolean isNeedSend, boolean isSms) throws Exception {
+    private CaptchaTokenBean __doGetCaptchaToken(ICaptchaModuleCfg captchaCfg, String tokenId, String target, boolean isNeedSend, boolean isSms) throws Exception {
         CaptchaTokenBean _tokenBean = captchaCfg.getCaptchaStorageAdapter().load(tokenId);
         if (_tokenBean == null || (captchaCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() >= captchaCfg.getTokenTimeout())) {
-            Captcha.get().generate(tokenId);
+            Captcha.get().generate(tokenId, target);
             _tokenBean = captchaCfg.getCaptchaStorageAdapter().load(tokenId);
             //
             if (_tokenBean != null) {
@@ -131,14 +134,14 @@ public class CaptchaController {
             ICaptchaTokenProcessor _processor = _captchaCfg.getCaptchaTokenProcessor();
             if (_processor != null) {
                 PairObject<Integer, String> _allowSend = _processor.isAllowCaptchaCodeSend(type, tokenId, target);
-                if (_allowSend != null) {
+                if (_allowSend != null && _allowSend.getKey() != null) {
                     _needSend = _allowSend.getKey() == 0;
                     if (!_needSend) {
                         return WebResult.CODE(ErrorCode.REQUEST_OPERATION_FORBIDDEN).msg(_allowSend.getValue()).toJSON();
                     }
                 }
             }
-            CaptchaTokenBean _tokenBean = __doGetCaptchaToken(_captchaCfg, tokenId, _needSend, _isSms);
+            CaptchaTokenBean _tokenBean = __doGetCaptchaToken(_captchaCfg, tokenId, target, _needSend, _isSms);
             if (_tokenBean != null) {
                 try {
                     if (!_captchaCfg.isDevelopMode()) {

@@ -45,16 +45,19 @@ public interface ICaptcha {
     /**
      * @param tokenId 身份令牌标识ID，用于区分不同客户端及数据存储范围
      * @param output  输出流对象
-     * @return 生成并返回验证码
+     * @return 生成图片并返回验证码
      * @throws Exception 可能产生的任何异常
      */
     String generate(String tokenId, OutputStream output) throws Exception;
 
     /**
      * @param tokenId 身份令牌标识ID，用于区分不同客户端及数据存储范围
+     * @param target  目标(当验证手机号码或邮件地址时使用)
      * @return 生成并返回验证码
      * @throws Exception 可能产生的任何异常
      */
+    String generate(String tokenId, String target) throws Exception;
+
     String generate(String tokenId) throws Exception;
 
     /**
@@ -69,11 +72,14 @@ public interface ICaptcha {
      * 检查验证码有效性
      *
      * @param tokenId 身份令牌标识ID，用于区分不同客户端及数据存储范围
+     * @param target  目标(当验证手机号码或邮件地址时使用)
      * @param token   验证码
      * @param invalid 方法被调用后是否使Token失效
      * @return 返回验证码状态
      * @throws Exception 可能产生的任何异常
      */
+    Status validate(String tokenId, String target, String token, boolean invalid) throws Exception;
+
     Status validate(String tokenId, String token, boolean invalid) throws Exception;
 
     /**

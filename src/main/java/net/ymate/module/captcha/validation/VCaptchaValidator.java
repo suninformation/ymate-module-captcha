@@ -24,6 +24,7 @@ import net.ymate.platform.validation.AbstractValidator;
 import net.ymate.platform.validation.ValidateContext;
 import net.ymate.platform.validation.ValidateResult;
 import net.ymate.platform.validation.annotation.Validator;
+import net.ymate.platform.webmvc.context.WebContext;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -49,7 +50,11 @@ public class VCaptchaValidator extends AbstractValidator {
                     _token = BlurObject.bind(context.getParamValue()).toStringValue();
                 }
                 try {
-                    if (!ICaptcha.Status.MATCHED.equals(Captcha.get().validate(_vCaptcha.tokenId(), _token, _vCaptcha.invalid()))) {
+                    String _target = StringUtils.trimToNull(_vCaptcha.targetName());
+                    if (_target != null) {
+                        _target = WebContext.getRequest().getParameter(_target);
+                    }
+                    if (!ICaptcha.Status.MATCHED.equals(Captcha.get().validate(_vCaptcha.tokenId(), _target, _token, _vCaptcha.invalid()))) {
                         _matched = true;
                     }
                 } catch (Exception e) {

@@ -25,7 +25,7 @@ public interface ICaptchaStorageAdapter {
 
     CaptchaTokenBean load(String tokenId) throws Exception;
 
-    boolean saveOrUpdate(String tokenId, String token) throws Exception;
+    boolean saveOrUpdate(String tokenId, String target, String token) throws Exception;
 
     void cleanup(String tokenId) throws Exception;
 }

@@ -105,28 +105,32 @@ public class Captcha implements IModule, ICaptcha {
 
     public String generate(String tokenId, OutputStream output) throws Exception {
         String _token = __moduleCfg.getCaptchaProvider().createCaptcha(output);
-        __moduleCfg.getCaptchaStorageAdapter().saveOrUpdate(tokenId, _token);
+        __moduleCfg.getCaptchaStorageAdapter().saveOrUpdate(tokenId, null, _token);
+        return _token;
+    }
+
+    public String generate(String tokenId, String target) throws Exception {
+        String _token = UUIDUtils.randomStr(__moduleCfg.getTokenLengthMin(), true);
+        __moduleCfg.getCaptchaStorageAdapter().saveOrUpdate(tokenId, target, _token);
         return _token;
     }
 
     public String generate(String tokenId) throws Exception {
-        String _token = UUIDUtils.randomStr(__moduleCfg.getTokenLengthMin(), true);
-        __moduleCfg.getCaptchaStorageAdapter().saveOrUpdate(tokenId, _token);
-        return _token;
+        return generate(tokenId, (String) null);
     }
 
     public void invalidate(String tokenId) throws Exception {
         __moduleCfg.getCaptchaStorageAdapter().cleanup(tokenId);
     }
 
-    public Status validate(String tokenId, String token, boolean invalid) throws Exception {
+    public Status validate(String tokenId, String target, String token, boolean invalid) throws Exception {
         Status _returnStatus = Status.INVALID;
         if (token != null) {
             CaptchaTokenBean _tokenBean = __moduleCfg.getCaptchaStorageAdapter().load(tokenId);
             if (_tokenBean != null) {
                 if (__moduleCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() > __moduleCfg.getTokenTimeout() * 1000) {
                     _returnStatus = Status.EXPIRED;
-                } else if (StringUtils.equalsIgnoreCase(_tokenBean.getToken(), token)) {
+                } else if (StringUtils.equalsIgnoreCase(_tokenBean.getTarget(), target) && StringUtils.equalsIgnoreCase(_tokenBean.getToken(), token)) {
                     _returnStatus = Status.MATCHED;
                 }
             }
@@ -135,6 +139,10 @@ public class Captcha implements IModule, ICaptcha {
             invalidate(tokenId);
         }
         return _returnStatus;
+    }
+
+    public Status validate(String tokenId, String token, boolean invalid) throws Exception {
+        return validate(tokenId, null, token, invalid);
     }
 
     public boolean isWrongTimesEnabled() {
