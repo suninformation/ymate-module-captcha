@@ -83,6 +83,11 @@ public interface ICaptcha {
     Status validate(String tokenId, String token, boolean invalid) throws Exception;
 
     /**
+     * @return 是否已禁用验证码模块
+     */
+    boolean isDisabled();
+
+    /**
      * @return 是否开启错误计数特性
      */
     boolean isWrongTimesEnabled();

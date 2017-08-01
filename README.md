@@ -131,6 +131,9 @@
     # module.captcha 模块初始化参数
     #-------------------------------------
     
+    # 验证码模块是否已被禁用(禁用后将忽略所有验证码相关参数验证), 默认值: false
+    ymp.configs.module.captcha.disabled=
+    
     # 是否开启调试模式(调试模式下控制台将输出生成的验证码, 同时短信验证码也不会被真正发送), 默认值: false
     ymp.configs.module.captcha.dev_mode=
     

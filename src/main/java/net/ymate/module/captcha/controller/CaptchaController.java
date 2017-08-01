@@ -19,6 +19,8 @@ import net.ymate.framework.validation.VMobile;
 import net.ymate.framework.webmvc.ErrorCode;
 import net.ymate.framework.webmvc.WebResult;
 import net.ymate.module.captcha.*;
+import net.ymate.module.captcha.intercept.CaptchaStatusInterceptor;
+import net.ymate.platform.core.beans.annotation.Before;
 import net.ymate.platform.core.lang.PairObject;
 import net.ymate.platform.core.util.RuntimeUtils;
 import net.ymate.platform.validation.validate.VEmail;
@@ -46,6 +48,7 @@ import java.io.ByteArrayOutputStream;
  */
 @Controller
 @RequestMapping("/captcha")
+@Before(CaptchaStatusInterceptor.class)
 public class CaptchaController {
 
     private static final Log _LOG = LogFactory.getLog(CaptchaController.class);

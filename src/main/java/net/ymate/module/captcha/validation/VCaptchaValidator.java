@@ -36,43 +36,45 @@ import org.apache.commons.lang.StringUtils;
 public class VCaptchaValidator extends AbstractValidator {
 
     public ValidateResult validate(ValidateContext context) {
-        boolean _matched = false;
-        VCaptcha _vCaptcha = (VCaptcha) context.getAnnotation();
-        if (!Captcha.get().isValidationNeedSkip(_vCaptcha.tokenId())) {
-            if (context.getParamValue() != null) {
-                String _token = null;
-                if (context.getParamValue().getClass().isArray()) {
-                    Object[] _objArr = (Object[]) context.getParamValue();
-                    if (_objArr.length > 0) {
-                        _token = BlurObject.bind(_objArr[0]).toStringValue();
+        if (!Captcha.get().getModuleCfg().isDisabled()) {
+            boolean _matched = false;
+            VCaptcha _vCaptcha = (VCaptcha) context.getAnnotation();
+            if (!Captcha.get().isValidationNeedSkip(_vCaptcha.tokenId())) {
+                if (context.getParamValue() != null) {
+                    String _token = null;
+                    if (context.getParamValue().getClass().isArray()) {
+                        Object[] _objArr = (Object[]) context.getParamValue();
+                        if (_objArr.length > 0) {
+                            _token = BlurObject.bind(_objArr[0]).toStringValue();
+                        }
+                    } else {
+                        _token = BlurObject.bind(context.getParamValue()).toStringValue();
+                    }
+                    try {
+                        String _target = StringUtils.trimToNull(_vCaptcha.targetName());
+                        if (_target != null) {
+                            _target = WebContext.getRequest().getParameter(_target);
+                        }
+                        if (!ICaptcha.Status.MATCHED.equals(Captcha.get().validate(_vCaptcha.tokenId(), _target, _token, _vCaptcha.invalid()))) {
+                            _matched = true;
+                        }
+                    } catch (Exception e) {
+                        throw new Error(RuntimeUtils.unwrapThrow(e));
                     }
                 } else {
-                    _token = BlurObject.bind(context.getParamValue()).toStringValue();
+                    _matched = true;
                 }
-                try {
-                    String _target = StringUtils.trimToNull(_vCaptcha.targetName());
-                    if (_target != null) {
-                        _target = WebContext.getRequest().getParameter(_target);
+                if (_matched) {
+                    String _pName = StringUtils.defaultIfBlank(context.getParamLabel(), context.getParamName());
+                    _pName = __doGetI18nFormatMessage(context, _pName, _pName);
+                    String _msg = StringUtils.trimToNull(_vCaptcha.msg());
+                    if (_msg != null) {
+                        _msg = __doGetI18nFormatMessage(context, _msg, _msg, _pName);
+                    } else {
+                        _msg = __doGetI18nFormatMessage(context, "ymp.validation.captcha_expired", "{0} is invalid or has expired.", _pName);
                     }
-                    if (!ICaptcha.Status.MATCHED.equals(Captcha.get().validate(_vCaptcha.tokenId(), _target, _token, _vCaptcha.invalid()))) {
-                        _matched = true;
-                    }
-                } catch (Exception e) {
-                    throw new Error(RuntimeUtils.unwrapThrow(e));
+                    return new ValidateResult(context.getParamName(), _msg);
                 }
-            } else {
-                _matched = true;
-            }
-            if (_matched) {
-                String _pName = StringUtils.defaultIfBlank(context.getParamLabel(), context.getParamName());
-                _pName = __doGetI18nFormatMessage(context, _pName, _pName);
-                String _msg = StringUtils.trimToNull(_vCaptcha.msg());
-                if (_msg != null) {
-                    _msg = __doGetI18nFormatMessage(context, _msg, _msg, _pName);
-                } else {
-                    _msg = __doGetI18nFormatMessage(context, "ymp.validation.captcha_expired", "{0} is invalid or has expired.", _pName);
-                }
-                return new ValidateResult(context.getParamName(), _msg);
             }
         }
         return null;

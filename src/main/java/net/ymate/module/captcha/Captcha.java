@@ -61,6 +61,7 @@ public class Captcha implements IModule, ICaptcha {
         return MODULE_NAME;
     }
 
+    @SuppressWarnings("unchecked")
     public void init(YMP owner) throws Exception {
         if (!__inited) {
             //
@@ -69,13 +70,15 @@ public class Captcha implements IModule, ICaptcha {
             //
             _LOG.info("Initializing ymate-module-captcha-" + VERSION + " - debug:" + __moduleCfg.isDevelopMode());
             //
-            __moduleCfg.getCaptchaProvider().init(this);
-            __moduleCfg.getCaptchaStorageAdapter().init(this);
-            if (__moduleCfg.getCaptchaTokenProcessor() != null) {
-                __moduleCfg.getCaptchaTokenProcessor().init(this);
-            }
-            if (__moduleCfg.getCaptchaSmsSendProvider() != null) {
-                __moduleCfg.getCaptchaSmsSendProvider().init(this);
+            if (!__moduleCfg.isDisabled()) {
+                __moduleCfg.getCaptchaProvider().init(this);
+                __moduleCfg.getCaptchaStorageAdapter().init(this);
+                if (__moduleCfg.getCaptchaTokenProcessor() != null) {
+                    __moduleCfg.getCaptchaTokenProcessor().init(this);
+                }
+                if (__moduleCfg.getCaptchaSmsSendProvider() != null) {
+                    __moduleCfg.getCaptchaSmsSendProvider().init(this);
+                }
             }
             //
             __inited = true;
@@ -104,12 +107,18 @@ public class Captcha implements IModule, ICaptcha {
     }
 
     public String generate(String tokenId, OutputStream output) throws Exception {
+        if (__moduleCfg.isDisabled()) {
+            throw new UnsupportedOperationException("Captcha module has been disabled");
+        }
         String _token = __moduleCfg.getCaptchaProvider().createCaptcha(output);
         __moduleCfg.getCaptchaStorageAdapter().saveOrUpdate(tokenId, null, _token);
         return _token;
     }
 
     public String generate(String tokenId, String target) throws Exception {
+        if (__moduleCfg.isDisabled()) {
+            throw new UnsupportedOperationException("Captcha module has been disabled");
+        }
         String _token = UUIDUtils.randomStr(__moduleCfg.getTokenLengthMin(), true);
         __moduleCfg.getCaptchaStorageAdapter().saveOrUpdate(tokenId, target, _token);
         return _token;
@@ -120,23 +129,31 @@ public class Captcha implements IModule, ICaptcha {
     }
 
     public void invalidate(String tokenId) throws Exception {
+        if (__moduleCfg.isDisabled()) {
+            throw new UnsupportedOperationException("Captcha module has been disabled");
+        }
         __moduleCfg.getCaptchaStorageAdapter().cleanup(tokenId);
     }
 
     public Status validate(String tokenId, String target, String token, boolean invalid) throws Exception {
+        if (isDisabled()) {
+            throw new UnsupportedOperationException("Captcha module has been disabled");
+        }
         Status _returnStatus = Status.INVALID;
-        if (token != null) {
-            CaptchaTokenBean _tokenBean = __moduleCfg.getCaptchaStorageAdapter().load(tokenId);
-            if (_tokenBean != null) {
-                if (__moduleCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() > __moduleCfg.getTokenTimeout() * 1000) {
-                    _returnStatus = Status.EXPIRED;
-                } else if (StringUtils.equalsIgnoreCase(_tokenBean.getTarget(), target) && StringUtils.equalsIgnoreCase(_tokenBean.getToken(), token)) {
-                    _returnStatus = Status.MATCHED;
+        if (!__moduleCfg.isDisabled()) {
+            if (token != null) {
+                CaptchaTokenBean _tokenBean = __moduleCfg.getCaptchaStorageAdapter().load(tokenId);
+                if (_tokenBean != null) {
+                    if (__moduleCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() > __moduleCfg.getTokenTimeout() * 1000) {
+                        _returnStatus = Status.EXPIRED;
+                    } else if (StringUtils.equalsIgnoreCase(_tokenBean.getTarget(), target) && StringUtils.equalsIgnoreCase(_tokenBean.getToken(), token)) {
+                        _returnStatus = Status.MATCHED;
+                    }
                 }
             }
-        }
-        if (invalid) {
-            invalidate(tokenId);
+            if (invalid) {
+                invalidate(tokenId);
+            }
         }
         return _returnStatus;
     }
@@ -145,12 +162,17 @@ public class Captcha implements IModule, ICaptcha {
         return validate(tokenId, null, token, invalid);
     }
 
+    @Override
+    public boolean isDisabled() {
+        return __moduleCfg.isDisabled();
+    }
+
     public boolean isWrongTimesEnabled() {
-        return __moduleCfg.getCaptchaTokenProcessor() != null && __moduleCfg.getNeedCaptchaWrongTimes() > 0;
+        return !__moduleCfg.isDisabled() && __moduleCfg.getCaptchaTokenProcessor() != null && __moduleCfg.getNeedCaptchaWrongTimes() > 0;
     }
 
     public boolean isValidationNeedSkip(String tokenId) {
-        return isWrongTimesEnabled() && __moduleCfg.getCaptchaTokenProcessor().isNeedSkipValidation(tokenId);
+        return !__moduleCfg.isDisabled() && isWrongTimesEnabled() && __moduleCfg.getCaptchaTokenProcessor().isNeedSkipValidation(tokenId);
     }
 
     public void resetWrongTimes(String tokenId) {
