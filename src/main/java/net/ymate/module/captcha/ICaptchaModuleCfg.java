@@ -43,37 +43,47 @@ public interface ICaptchaModuleCfg {
     /**
      * @return 验证码存储适配器类, 默认值: net.ymate.module.captcha.impl.DefaultCaptchaStorageAdapter
      */
-    ICaptchaStorageAdapter getCaptchaStorageAdapter();
+    ICaptchaStorageAdapter getStorageAdapter();
 
     /**
      * @return 手机短信验证码发送服务提供者类, 默认值: 空
      */
-    ICaptchaSendProvider getCaptchaSmsSendProvider();
+    ICaptchaSendProvider getSmsSendProvider();
 
     /**
      * @return 邮件验证码发送服务提供者类, 默认值: 空
      */
-    ICaptchaSendProvider getCaptchaMailSendProvider();
+    ICaptchaSendProvider getMailSendProvider();
+
+    /**
+     * @return 邮件验证码模板视图路径, 默认值: captcha_email
+     */
+    String getMailTemplateView();
+
+    /**
+     * @return 验证码邮件主题, 默认值: 空
+     */
+    String getMailSubject();
 
     /**
      * @return 身份令牌标识扩展处理器, 默认值: 空
      */
-    ICaptchaTokenProcessor getCaptchaTokenProcessor();
+    ICaptchaTokenProcessor getTokenProcessor();
 
     /**
      * @return 手机短信验证码内容模板, 默认值: ${captcha}
      */
-    String getCaptchaSmsContentTemplate();
+    String getSmsContentTemplate();
 
     /**
      * @return 相同令牌标识范围的短信验证码重复发送的是时间间隔(秒), 默认为120秒
      */
-    int getCaptchaSmsSendTimeInterval();
+    int getSmsSendTimeInterval();
 
     /**
      * @return 相同令牌标识范围的邮件验证码重复发送的是时间间隔(秒), 默认为300秒
      */
-    int getCaptchaMailSendTimeInterval();
+    int getMailSendTimeInterval();
 
     /**
      * @return 设置在达到指定错误次数上限后开启验证码, 默认为0则表示不开启错误记数特性

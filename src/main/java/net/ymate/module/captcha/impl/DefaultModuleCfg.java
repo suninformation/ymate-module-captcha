@@ -36,21 +36,25 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
 
     private boolean __isDevelopMode;
 
-    private ICaptchaProvider captchaProvider;
+    private ICaptchaProvider __provider;
 
-    private ICaptchaStorageAdapter captchaStorageAdapter;
+    private ICaptchaStorageAdapter __storageAdapter;
 
-    private ICaptchaTokenProcessor captchaTokenProcessor;
+    private ICaptchaTokenProcessor __tokenProcessor;
 
-    private ICaptchaSendProvider captchaSmsSendProvider;
+    private ICaptchaSendProvider __smsSendProvider;
 
-    private ICaptchaSendProvider captchaMailSendProvider;
+    private ICaptchaSendProvider __mailSendProvider;
 
-    private String captchaSmsContentTemplate;
+    private String __mailTemplateView;
 
-    private int captchaSmsSendTimeInterval;
+    private String __mailSubject;
 
-    private int captchaMailSendTimeInterval;
+    private String __smsContentTemplate;
+
+    private int __smsSendTimeInterval;
+
+    private int __mailSendTimeInterval;
 
     private int __needCaptchaWrongTimes;
 
@@ -97,38 +101,42 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
             foregrounds = new ArrayList<Color>();
             fonts = new ArrayList<Font>();
             //
-            if ((captchaProvider = ClassUtils.impl(_moduleCfgs.get("provider_class"), ICaptchaProvider.class, this.getClass())) == null) {
-                captchaProvider = new DefaultCaptchaProvider();
+            if ((__provider = ClassUtils.impl(_moduleCfgs.get("provider_class"), ICaptchaProvider.class, this.getClass())) == null) {
+                __provider = new DefaultCaptchaProvider();
             }
             //
-            if ((captchaStorageAdapter = ClassUtils.impl(_moduleCfgs.get("storage_adapter_class"), ICaptchaStorageAdapter.class, this.getClass())) == null) {
-                captchaStorageAdapter = new DefaultCaptchaStorageAdapter();
+            if ((__storageAdapter = ClassUtils.impl(_moduleCfgs.get("storage_adapter_class"), ICaptchaStorageAdapter.class, this.getClass())) == null) {
+                __storageAdapter = new DefaultCaptchaStorageAdapter();
             }
             //
-            captchaTokenProcessor = ClassUtils.impl(_moduleCfgs.get("token_processor_class"), ICaptchaTokenProcessor.class, this.getClass());
+            __tokenProcessor = ClassUtils.impl(_moduleCfgs.get("token_processor_class"), ICaptchaTokenProcessor.class, this.getClass());
             //
-            captchaMailSendProvider = ClassUtils.impl(_moduleCfgs.get("mail_send_provider_class"), ICaptchaSendProvider.class, this.getClass());
-            //
-            captchaSmsSendProvider = ClassUtils.impl(_moduleCfgs.get("sms_send_provider_class"), ICaptchaSendProvider.class, this.getClass());
-            if (captchaSmsSendProvider != null) {
-                captchaSmsContentTemplate = StringUtils.defaultIfBlank(_moduleCfgs.get("sms_content_template"), "${captcha}");
+            __mailSendProvider = ClassUtils.impl(_moduleCfgs.get("mail_send_provider_class"), ICaptchaSendProvider.class, this.getClass());
+            if (__mailSendProvider != null) {
+                __mailTemplateView = StringUtils.defaultIfBlank(_moduleCfgs.get("mail_template_view"), "captcha_email");
+                __mailSubject = StringUtils.trimToEmpty(_moduleCfgs.get("mail_subject"));
             }
             //
-            captchaSmsSendTimeInterval = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("sms_send_time_interval"), "120")).toIntValue();
-            if (captchaSmsSendTimeInterval <= 0) {
-                captchaSmsSendTimeInterval = 120;
+            __smsSendProvider = ClassUtils.impl(_moduleCfgs.get("sms_send_provider_class"), ICaptchaSendProvider.class, this.getClass());
+            if (__smsSendProvider != null) {
+                __smsContentTemplate = StringUtils.defaultIfBlank(_moduleCfgs.get("sms_content_template"), "${captcha}");
             }
             //
-            captchaMailSendTimeInterval = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("mail_send_time_interval"), "300")).toIntValue();
-            if (captchaMailSendTimeInterval <= 0) {
-                captchaMailSendTimeInterval = 300;
+            __smsSendTimeInterval = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("sms_send_time_interval"), "120")).toIntValue();
+            if (__smsSendTimeInterval <= 0) {
+                __smsSendTimeInterval = 120;
+            }
+            //
+            __mailSendTimeInterval = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("mail_send_time_interval"), "300")).toIntValue();
+            if (__mailSendTimeInterval <= 0) {
+                __mailSendTimeInterval = 300;
             }
             //
             __needCaptchaWrongTimes = BlurObject.bind(_moduleCfgs.get("need_captcha_wrong_times")).toIntValue();
             if (__needCaptchaWrongTimes < 0) {
                 __needCaptchaWrongTimes = 0;
-            } else if (__needCaptchaWrongTimes > 0 && captchaTokenProcessor == null) {
-                captchaTokenProcessor = new DefaultCaptchaTokenProcessor();
+            } else if (__needCaptchaWrongTimes > 0 && __tokenProcessor == null) {
+                __tokenProcessor = new DefaultCaptchaTokenProcessor();
             }
             //
             __cacheNamePrefix = StringUtils.trimToEmpty(_moduleCfgs.get("cache_name_prefix"));
@@ -217,35 +225,44 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
     }
 
     public ICaptchaProvider getCaptchaProvider() {
-        return captchaProvider;
+        return __provider;
     }
 
-    public ICaptchaStorageAdapter getCaptchaStorageAdapter() {
-        return captchaStorageAdapter;
+    public ICaptchaStorageAdapter getStorageAdapter() {
+        return __storageAdapter;
     }
 
-    public ICaptchaSendProvider getCaptchaSmsSendProvider() {
-        return captchaSmsSendProvider;
+    public ICaptchaSendProvider getSmsSendProvider() {
+        return __smsSendProvider;
     }
 
-    public ICaptchaSendProvider getCaptchaMailSendProvider() {
-        return captchaMailSendProvider;
+    public ICaptchaSendProvider getMailSendProvider() {
+        return __mailSendProvider;
     }
 
-    public ICaptchaTokenProcessor getCaptchaTokenProcessor() {
-        return captchaTokenProcessor;
+    public String getMailTemplateView() {
+        return __mailTemplateView;
     }
 
-    public String getCaptchaSmsContentTemplate() {
-        return captchaSmsContentTemplate;
+    @Override
+    public String getMailSubject() {
+        return __mailSubject;
     }
 
-    public int getCaptchaSmsSendTimeInterval() {
-        return captchaSmsSendTimeInterval;
+    public ICaptchaTokenProcessor getTokenProcessor() {
+        return __tokenProcessor;
     }
 
-    public int getCaptchaMailSendTimeInterval() {
-        return captchaMailSendTimeInterval;
+    public String getSmsContentTemplate() {
+        return __smsContentTemplate;
+    }
+
+    public int getSmsSendTimeInterval() {
+        return __smsSendTimeInterval;
+    }
+
+    public int getMailSendTimeInterval() {
+        return __mailSendTimeInterval;
     }
 
     public int getNeedCaptchaWrongTimes() {

@@ -149,6 +149,12 @@
     # 邮件验证码发送服务提供者类, 默认值: 空
     ymp.configs.module.captcha.mail_send_provider_class=
     
+    # 邮件验证码模板视图路径, 默认值: captcha_email
+    ymp.configs.module.captcha.mail_template_view=
+    
+    # 验证码邮件主题, 默认值: 空
+    ymp.configs.module.captcha.mail_subject=
+    
     # 相同令牌标识范围的邮件验证码重复发送的是时间间隔(秒), 默认值: 300秒
     ymp.configs.module.captcha.mail_send_time_interval=
     

@@ -103,10 +103,10 @@ public class CaptchaController {
     }
 
     private CaptchaTokenBean __doGetCaptchaToken(ICaptchaModuleCfg captchaCfg, String tokenId, String target, boolean isNeedSend, boolean isSms) throws Exception {
-        CaptchaTokenBean _tokenBean = captchaCfg.getCaptchaStorageAdapter().load(tokenId);
+        CaptchaTokenBean _tokenBean = captchaCfg.getStorageAdapter().load(tokenId);
         if (_tokenBean == null || (captchaCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() >= captchaCfg.getTokenTimeout())) {
             Captcha.get().generate(tokenId, target);
-            _tokenBean = captchaCfg.getCaptchaStorageAdapter().load(tokenId);
+            _tokenBean = captchaCfg.getStorageAdapter().load(tokenId);
             //
             if (_tokenBean != null) {
                 isNeedSend = true;
@@ -115,7 +115,7 @@ public class CaptchaController {
                 }
             }
         }
-        int interval = isSms ? captchaCfg.getCaptchaSmsSendTimeInterval() : captchaCfg.getCaptchaMailSendTimeInterval();
+        int interval = isSms ? captchaCfg.getSmsSendTimeInterval() : captchaCfg.getMailSendTimeInterval();
         if (_tokenBean != null && (isNeedSend || System.currentTimeMillis() - _tokenBean.getCreateTime() > interval * 1000)) {
             return _tokenBean;
         }
@@ -128,13 +128,13 @@ public class CaptchaController {
         boolean _isSms = false;
         if (StringUtils.equalsIgnoreCase(type, ICaptcha.Const.TOKEN_SMS)) {
             _isSms = true;
-            _sender = _captchaCfg.getCaptchaSmsSendProvider();
+            _sender = _captchaCfg.getSmsSendProvider();
         } else if (StringUtils.equalsIgnoreCase(type, ICaptcha.Const.TOKEN_MAIL)) {
-            _sender = _captchaCfg.getCaptchaMailSendProvider();
+            _sender = _captchaCfg.getMailSendProvider();
         }
         if (_sender != null) {
             boolean _needSend = false;
-            ICaptchaTokenProcessor _processor = _captchaCfg.getCaptchaTokenProcessor();
+            ICaptchaTokenProcessor _processor = _captchaCfg.getTokenProcessor();
             if (_processor != null) {
                 PairObject<Integer, String> _allowSend = _processor.isAllowCaptchaCodeSend(type, tokenId, target);
                 if (_allowSend != null && _allowSend.getKey() != null) {
