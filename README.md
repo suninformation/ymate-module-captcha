@@ -71,11 +71,13 @@
 
 - 检查验证码是否合法
 
-        http://<你的域名>/captcha/match?tokenId=<TOKEN_ID>&token=<TOKEN>
+        http://<你的域名>/captcha/match?tokenId=<TOKEN_ID>&token=<TOKEN>&target=<TARGET>
 
     > tokenId：令牌标识ID, 可选参数；
     >
     > token：预验证的令牌值，必选参数；
+    >
+    > target：当验证手机或邮件时必须指定对应的手机号或邮箱地址
     
     返回值：
 
@@ -92,9 +94,9 @@
                                @VRequried
                                @VMobile
                                @RequestParam String mobile, // 手机号码
-                                
+                               
                                @VRequried
-                               @VCaptcha(tokenId = ICaptcha.Const.TOKEN_SMS)
+                               @VCaptcha(tokenId = ICaptcha.Const.TOKEN_SMS, target="mobile")
                                @RequestParam String smscode, // 短信验证码
     
                                @VRequried
