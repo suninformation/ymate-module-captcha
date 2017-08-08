@@ -104,7 +104,9 @@ public class CaptchaController {
 
     private CaptchaTokenBean __doGetCaptchaToken(ICaptchaModuleCfg captchaCfg, String tokenId, String target, boolean isNeedSend, boolean isSms) throws Exception {
         CaptchaTokenBean _tokenBean = captchaCfg.getStorageAdapter().load(tokenId);
-        if (_tokenBean == null || (captchaCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() >= captchaCfg.getTokenTimeout())) {
+        if (_tokenBean == null
+                || !StringUtils.equalsIgnoreCase(StringUtils.trimToNull(_tokenBean.getTarget()), StringUtils.trimToNull(target))
+                || (captchaCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() >= captchaCfg.getTokenTimeout())) {
             Captcha.get().generate(tokenId, target);
             _tokenBean = captchaCfg.getStorageAdapter().load(tokenId);
             //
