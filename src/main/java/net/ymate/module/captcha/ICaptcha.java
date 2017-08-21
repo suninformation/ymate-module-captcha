@@ -61,6 +61,11 @@ public interface ICaptcha {
     String generate(String tokenId) throws Exception;
 
     /**
+     * @return 生成自定义验证码字符串, 若未配置自定义token生成器则返回null
+     */
+    String generateToken();
+
+    /**
      * 清除验证码数据
      *
      * @param tokenId 身份令牌标识ID，用于区分不同客户端及数据存储范围

@@ -23,6 +23,7 @@ import com.github.cage.image.ScaleConfig;
 import com.github.cage.token.RandomTokenGenerator;
 import net.ymate.module.captcha.ICaptcha;
 import net.ymate.module.captcha.ICaptchaProvider;
+import org.apache.commons.lang.StringUtils;
 
 import java.awt.*;
 import java.io.OutputStream;
@@ -34,9 +35,12 @@ import java.util.Random;
  */
 public class DefaultCaptchaProvider implements ICaptchaProvider {
 
+    private ICaptcha __owner;
+
     private Cage __cage;
 
     public void init(ICaptcha owner) throws Exception {
+        __owner = owner;
         //
         Random _random = new Random();
         //
@@ -61,7 +65,10 @@ public class DefaultCaptchaProvider implements ICaptchaProvider {
     }
 
     public String createCaptcha(OutputStream output) throws Exception {
-        String _token = __cage.getTokenGenerator().next();
+        String _token = __owner.generateToken();
+        if (StringUtils.isBlank(_token)) {
+            _token = __cage.getTokenGenerator().next();
+        }
         __cage.draw(_token, output);
         //
         return _token;

@@ -41,6 +41,11 @@ public interface ICaptchaModuleCfg {
     ICaptchaProvider getCaptchaProvider();
 
     /**
+     * @return 自定义验证码生成器类, 默认值: 空
+     */
+    ICaptchaTokenGenerator getTokenGenerator();
+
+    /**
      * @return 验证码存储适配器类, 默认值: net.ymate.module.captcha.impl.DefaultCaptchaStorageAdapter
      */
     ICaptchaStorageAdapter getStorageAdapter();

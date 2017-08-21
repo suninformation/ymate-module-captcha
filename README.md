@@ -142,6 +142,9 @@
     # 验证码服务提供者类, 默认值: net.ymate.module.captcha.impl.DefaultCaptchaProvider
     ymp.configs.module.captcha.provider_class=
     
+    # 自定义验证码生成器类, 默认值: 空
+    ymp.configs.module.captcha.token_generator_class=
+    
     # 验证码存储适配器类, 默认值: net.ymate.module.captcha.impl.DefaultCaptchaStorageAdapter
     ymp.configs.module.captcha.storage_adapter_class=
     

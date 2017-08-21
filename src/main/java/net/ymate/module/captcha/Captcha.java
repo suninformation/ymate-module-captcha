@@ -73,6 +73,9 @@ public class Captcha implements IModule, ICaptcha {
             if (!__moduleCfg.isDisabled()) {
                 __moduleCfg.getCaptchaProvider().init(this);
                 __moduleCfg.getStorageAdapter().init(this);
+                if (__moduleCfg.getTokenGenerator() != null) {
+                    __moduleCfg.getTokenGenerator().init(this);
+                }
                 if (__moduleCfg.getTokenProcessor() != null) {
                     __moduleCfg.getTokenProcessor().init(this);
                 }
@@ -119,13 +122,23 @@ public class Captcha implements IModule, ICaptcha {
         if (__moduleCfg.isDisabled()) {
             throw new UnsupportedOperationException("Captcha module has been disabled");
         }
-        String _token = UUIDUtils.randomStr(__moduleCfg.getTokenLengthMin(), true);
+        String _token = generateToken();
+        if (StringUtils.isBlank(_token)) {
+            _token = UUIDUtils.randomStr(__moduleCfg.getTokenLengthMin(), true);
+        }
         __moduleCfg.getStorageAdapter().saveOrUpdate(tokenId, target, _token);
         return _token;
     }
 
     public String generate(String tokenId) throws Exception {
         return generate(tokenId, (String) null);
+    }
+
+    public String generateToken() {
+        if (__moduleCfg.getTokenGenerator() != null) {
+            return __moduleCfg.getTokenGenerator().generate();
+        }
+        return null;
     }
 
     public void invalidate(String tokenId) throws Exception {

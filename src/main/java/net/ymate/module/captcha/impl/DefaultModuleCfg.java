@@ -38,6 +38,8 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
 
     private ICaptchaProvider __provider;
 
+    private ICaptchaTokenGenerator __tokenGenerator;
+
     private ICaptchaStorageAdapter __storageAdapter;
 
     private ICaptchaTokenProcessor __tokenProcessor;
@@ -108,6 +110,8 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
             if ((__storageAdapter = ClassUtils.impl(_moduleCfgs.get("storage_adapter_class"), ICaptchaStorageAdapter.class, this.getClass())) == null) {
                 __storageAdapter = new DefaultCaptchaStorageAdapter();
             }
+            //
+            __tokenGenerator = ClassUtils.impl(_moduleCfgs.get("token_generator_class"), ICaptchaTokenGenerator.class, this.getClass());
             //
             __tokenProcessor = ClassUtils.impl(_moduleCfgs.get("token_processor_class"), ICaptchaTokenProcessor.class, this.getClass());
             //
@@ -226,6 +230,10 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
 
     public ICaptchaProvider getCaptchaProvider() {
         return __provider;
+    }
+
+    public ICaptchaTokenGenerator getTokenGenerator() {
+        return __tokenGenerator;
     }
 
     public ICaptchaStorageAdapter getStorageAdapter() {
