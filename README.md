@@ -29,23 +29,23 @@
 
 - 获取验证码图片
 
-        http://<你的域名>/captcha?tokenId=<TOKEN_ID>&type=<TYPE>
+        http://<你的域名>/captcha?scope=<SCOPE>&type=<TYPE>
 
-    > tokenId：令牌标识ID, 用于区分不同客户端及数据存储范围，相同令牌ID间仅存在唯一验证码，可选参数；
+    > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
     >
-    > type：仅当`type=1`时采用Base64编码输出图片，可选参数；
+    > type：仅当type=data时采用Base64编码输出图片，可选参数；
 
 - 发送短信验证码
 
-        http://<你的域名>/captcha/sms_code?tokenId=<TOKEN_ID>&mobile=<MOBILE>
+        http://<你的域名>/captcha/sms_code?scope=<SCOPE>&mobile=<MOBILE>
 
-    > tokenId：令牌标识ID, 采用`sms`作为前缀，区别于图片验证码，可选参数；
+    > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
     >
     > mobile：手机号码，必选参数；
     
     返回值说明：
     
-        {ret: 0, msg: "..."}
+        {ret: 0}
     
     > - `ret=0` 表示发送成功
     > - `ret=-1` 表示参数验证错误
@@ -54,15 +54,15 @@
 
 - 发送邮件验证码
 
-        http://<你的域名>/captcha/mail_code?tokenId=<TOKEN_ID>&email=<EMAIL>
+        http://<你的域名>/captcha/mail_code?scope=<SCOPE>&email=<EMAIL>
 
-    > tokenId：令牌标识ID, 采用`mail`作为前缀，区别于图片验证码，可选参数；
+    > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
     >
     > email：邮件地址，必选参数；
     
     返回值说明：
     
-        {ret: 0, msg: "..."}
+        {ret: 0}
     
     > - `ret=0` 表示发送成功
     > - `ret=-1` 表示参数验证错误
@@ -71,9 +71,9 @@
 
 - 检查验证码是否合法
 
-        http://<你的域名>/captcha/match?tokenId=<TOKEN_ID>&token=<TOKEN>&target=<TARGET>
+        http://<你的域名>/captcha/match?scope=<SCOPE>&token=<TOKEN>&target=<TARGET>
 
-    > tokenId：令牌标识ID, 可选参数；
+    > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
     >
     > token：预验证的令牌值，必选参数；
     >
@@ -96,7 +96,7 @@
                                @RequestParam String mobile, // 手机号码
                                
                                @VRequried
-                               @VCaptcha(tokenId = ICaptcha.Const.TOKEN_SMS, target="mobile")
+                               @VCaptcha(type = ICaptcha.Type.MAIL, scope = "login", targetName="mobile")
                                @RequestParam String smscode, // 短信验证码
     
                                @VRequried
@@ -111,19 +111,19 @@
 
         // 生成作用域为user.login的验证码
         String _code = Captcha.get().generate("user.login");
-        
+
         // 销毁作用域为user.login的验证码
         Captcha.get().invalidate("user.login");
-        
+
         // 判断是否开启错误记数，开启后将支持跳过参数验证
         Captcha.get().isWrongTimesEnabled();
-        
+
         // 判断作用域为user.login的验证码是否允许忽略
-        Captcha.get().isValidationNeedSkip("user.login");
-        
+        Captcha.get().isValidationNeedSkip(ICaptcha.Type.DEFAULT, "user.login");
+
         // 重置作用域为user.login的验证码错误计数器
-        Captcha.get().resetWrongTimes("user.login");
-        
+        Captcha.get().resetWrongTimes(ICaptcha.Type.DEFAULT, "user.login");
+
         // 验证作用域为user.login的验证码是否匹配以及验证后是否使其失效
         Captcha.get().validate("user.login", _code, true);
 
@@ -145,32 +145,14 @@
     # 自定义验证码生成器类, 默认值: 空
     ymp.configs.module.captcha.token_generator_class=
     
-    # 验证码存储适配器类, 默认值: net.ymate.module.captcha.impl.DefaultCaptchaStorageAdapter
+    # 验证码存储适配器类, 必须, 默认值: 空
     ymp.configs.module.captcha.storage_adapter_class=
     
-    # 身份令牌标识扩展处理器, 默认值: 空
-    ymp.configs.module.captcha.token_processor_class=
+    # 作用域标识扩展处理器, 开启错误记数时为必须, 默认值: 空
+    ymp.configs.module.captcha.scope_processor_class=
     
-    # 邮件验证码发送服务提供者类, 默认值: 空
-    ymp.configs.module.captcha.mail_send_provider_class=
-    
-    # 邮件验证码模板视图路径, 默认值: captcha_email
-    ymp.configs.module.captcha.mail_template_view=
-    
-    # 验证码邮件主题, 默认值: 空
-    ymp.configs.module.captcha.mail_subject=
-    
-    # 相同令牌标识范围的邮件验证码重复发送的是时间间隔(秒), 默认值: 300秒
-    ymp.configs.module.captcha.mail_send_time_interval=
-    
-    # 手机短信验证码发送服务提供者类, 默认值: 空
-    ymp.configs.module.captcha.sms_send_provider_class=
-    
-    # 手机短信验证码内容模板, 默认值: ${captcha}
-    ymp.configs.module.captcha.sms_content_template=
-    
-    # 相同令牌标识范围的短信验证码重复发送的是时间间隔(秒), 默认值: 120秒
-    ymp.configs.module.captcha.sms_send_time_interval=
+    # 手机短信或邮件验证码发送服务提供者类, 默认值: 空
+    ymp.configs.module.captcha.send_provider_class=
     
     # 设置在达到指定错误次数上限后开启验证码, 默认值: 0, 表示不开启错误记数特性
     ymp.configs.module.captcha.need_captcha_wrong_times=
