@@ -71,19 +71,19 @@ public class DefaultCaptchaScopeProcessor implements ICaptchaScopeProcessor {
     }
 
     @Override
-    public void resetWrongTimes(ICaptcha.Type type, String tokenId) {
+    public void resetWrongTimes(ICaptcha.Type type, String scope) {
         switch (type) {
             case DEFAULT:
-                __tokenWrongTimesCache.remove(__buildCacheKey(tokenId));
+                __tokenWrongTimesCache.remove(__buildCacheKey(scope));
                 // 同时移除写入Cookie的内容
-                CookieHelper.bind(WebMVC.get()).removeCookie(__cacheNamePrefix.concat(StringUtils.trimToEmpty(tokenId)));
+                CookieHelper.bind(WebMVC.get()).removeCookie(__cacheNamePrefix.concat(StringUtils.trimToEmpty(scope)));
                 break;
             default:
         }
     }
 
     @Override
-    public boolean isAllowSendCode(ICaptcha.Type type, String tokenId, String target) {
+    public boolean isAllowSendCode(ICaptcha.Type type, String scope, String target) {
         return false;
     }
 }

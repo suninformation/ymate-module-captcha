@@ -55,10 +55,10 @@ public class DefaultCaptchaStorageAdapter implements ICaptchaStorageAdapter {
     }
 
     @Override
-    public void cleanup(String tokenId) throws Exception {
+    public void cleanup(String scope) throws Exception {
         HttpSession _session = WebContext.getRequest().getSession(false);
         if (_session != null) {
-            _session.removeAttribute(StringUtils.defaultIfBlank(tokenId, CaptchaTokenBean.class.getName()));
+            _session.removeAttribute(StringUtils.defaultIfBlank(scope, CaptchaTokenBean.class.getName()));
         }
     }
 }
