@@ -25,6 +25,7 @@ import net.ymate.platform.validation.ValidateContext;
 import net.ymate.platform.validation.ValidateResult;
 import net.ymate.platform.validation.annotation.Validator;
 import net.ymate.platform.webmvc.context.WebContext;
+import net.ymate.platform.webmvc.util.CookieHelper;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -35,12 +36,29 @@ import org.apache.commons.lang.StringUtils;
 @CleanProxy
 public class VCaptchaValidator extends AbstractValidator {
 
+    private String __doGetCaptchaScope() {
+        // 尝试从请求参数中获取Token数据
+        String _scopeStr = WebContext.getRequest().getParameter("captcha_scope");
+        if (StringUtils.isBlank(_scopeStr)) {
+            // 尝试从请求头中获取Token数据
+            _scopeStr = WebContext.getRequest().getHeader("X-ModuleCaptcha-Scope");
+            if (StringUtils.isBlank(_scopeStr)) {
+                // 最后从Cookie中获取Token数据
+                _scopeStr = CookieHelper.bind(WebContext.getContext().getOwner())
+                        .getCookie("module.captcha_scope")
+                        .toStringValue();
+            }
+        }
+        return _scopeStr;
+    }
+
     @Override
     public ValidateResult validate(ValidateContext context) {
         if (!Captcha.get().getModuleCfg().isDisabled()) {
             boolean _matched = false;
             VCaptcha _vCaptcha = (VCaptcha) context.getAnnotation();
-            if (!Captcha.get().isValidationNeedSkip(_vCaptcha.type(), _vCaptcha.scope())) {
+            String _scope = StringUtils.defaultIfBlank(__doGetCaptchaScope(), _vCaptcha.scope());
+            if (!Captcha.get().isValidationNeedSkip(_vCaptcha.type(), _scope)) {
                 if (context.getParamValue() != null) {
                     String _token = null;
                     if (context.getParamValue().getClass().isArray()) {
@@ -56,7 +74,7 @@ public class VCaptchaValidator extends AbstractValidator {
                         if (_target != null) {
                             _target = WebContext.getRequest().getParameter(_target);
                         }
-                        if (!ICaptcha.Status.MATCHED.equals(Captcha.get().validate(_vCaptcha.scope(), _target, _token, _vCaptcha.invalid()))) {
+                        if (!ICaptcha.Status.MATCHED.equals(Captcha.get().validate(_scope, _target, _token, _vCaptcha.invalid()))) {
                             _matched = true;
                         }
                     } catch (Exception e) {

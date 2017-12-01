@@ -37,6 +37,11 @@ public class CaptchaTokenBean implements Serializable {
     private String token;
 
     /**
+     * 作用域
+     */
+    private String scope;
+
+    /**
      * 验证码状态
      */
     private ICaptcha.Status status;
@@ -47,10 +52,15 @@ public class CaptchaTokenBean implements Serializable {
     private long createTime;
 
     public CaptchaTokenBean(String token) {
+        this(token, null);
+    }
+
+    public CaptchaTokenBean(String token, String scope) {
         if (StringUtils.isBlank(token)) {
             throw new NullArgumentException("token");
         }
         this.token = token;
+        this.scope = scope;
         this.status = ICaptcha.Status.NORMAL;
         this.createTime = System.currentTimeMillis();
     }
@@ -74,5 +84,9 @@ public class CaptchaTokenBean implements Serializable {
 
     public long getCreateTime() {
         return createTime;
+    }
+
+    public String getScope() {
+        return scope;
     }
 }

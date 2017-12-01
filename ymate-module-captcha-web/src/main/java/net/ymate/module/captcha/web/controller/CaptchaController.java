@@ -68,9 +68,13 @@ public class CaptchaController {
         return WebResult.formatView(WebResult.CODE(ErrorCode.INTERNAL_SYSTEM_ERROR), "json");
     }
 
+    private String __doCaptchaBase64(String contentType, ByteArrayOutputStream outputStream) {
+        return "data:" + contentType + ";base64," + Base64.encodeBase64String(outputStream.toByteArray());
+    }
+
     /**
      * @param scope 作用域标识，用于区分不同客户端及数据存储范围
-     * @param type  仅当type=data时采用Base64编码输出图片
+     * @param type  输出类型，取值范围：空|data|json，当type=data或type=json时采用Base64编码输出图片
      * @return 返回生成的验证码图片
      * @throws Exception 可能产生的任何异常
      */
@@ -87,7 +91,12 @@ public class CaptchaController {
         String _contentType = "image/" + _captcha.getModuleCfg().getFormat();
         //
         if (StringUtils.equalsIgnoreCase(type, "data")) {
-            return View.textView("data:" + _contentType + ";base64," + Base64.encodeBase64String(_output.toByteArray()));
+            return View.textView(__doCaptchaBase64(_contentType, _output));
+        } else if (StringUtils.equalsIgnoreCase(type, "json")) {
+            CaptchaTokenBean _tokenBean = _captcha.getModuleCfg().getStorageAdapter().load(scope);
+            return WebResult.formatView(WebResult.SUCCESS()
+                    .dataAttr("scope", _tokenBean.getScope())
+                    .dataAttr("captcha", __doCaptchaBase64(_contentType, _output)));
         }
         return new BinaryView(new ByteArrayInputStream(_output.toByteArray()), _output.size()).setContentType(_contentType);
     }

@@ -46,7 +46,7 @@ public class DefaultCaptchaStorageAdapter implements ICaptchaStorageAdapter {
     public CaptchaTokenBean saveOrUpdate(String scope, String target, String token) throws Exception {
         HttpSession _session = WebContext.getRequest().getSession(false);
         if (_session != null) {
-            CaptchaTokenBean _tokenBean = new CaptchaTokenBean(token).setTarget(target);
+            CaptchaTokenBean _tokenBean = new CaptchaTokenBean(token, scope).setTarget(target);
             _session.setAttribute(StringUtils.defaultIfBlank(scope, CaptchaTokenBean.class.getName()), _tokenBean);
             //
             return _tokenBean;
