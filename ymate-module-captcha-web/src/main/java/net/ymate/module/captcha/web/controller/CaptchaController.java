@@ -86,17 +86,16 @@ public class CaptchaController {
         ICaptcha _captcha = Captcha.get();
         //
         ByteArrayOutputStream _output = new ByteArrayOutputStream();
-        _captcha.generate(scope, _output);
+        CaptchaTokenBean _bean = _captcha.generate(scope, _output);
         //
         String _contentType = "image/" + _captcha.getModuleCfg().getFormat();
         //
         if (StringUtils.equalsIgnoreCase(type, "data")) {
             return View.textView(__doCaptchaBase64(_contentType, _output));
         } else if (StringUtils.equalsIgnoreCase(type, "json")) {
-            CaptchaTokenBean _tokenBean = _captcha.getModuleCfg().getStorageAdapter().load(scope);
-            return WebResult.formatView(WebResult.SUCCESS()
-                    .dataAttr("scope", _tokenBean.getScope())
-                    .dataAttr("captcha", __doCaptchaBase64(_contentType, _output)));
+            return WebResult.SUCCESS()
+                    .dataAttr("scope", _bean.getScope())
+                    .dataAttr("captcha", __doCaptchaBase64(_contentType, _output)).toJSON();
         }
         return new BinaryView(new ByteArrayInputStream(_output.toByteArray()), _output.size()).setContentType(_contentType);
     }

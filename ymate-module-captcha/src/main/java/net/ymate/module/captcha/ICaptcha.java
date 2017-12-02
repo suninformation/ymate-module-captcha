@@ -48,7 +48,7 @@ public interface ICaptcha {
      * @return 生成图片并返回验证码
      * @throws Exception 可能产生的任何异常
      */
-    String generate(String scope, OutputStream output) throws Exception;
+    CaptchaTokenBean generate(String scope, OutputStream output) throws Exception;
 
     /**
      * @param scope  作用域标识，用于区分不同客户端及数据存储范围
@@ -56,9 +56,9 @@ public interface ICaptcha {
      * @return 生成并返回验证码
      * @throws Exception 可能产生的任何异常
      */
-    String generate(String scope, String target) throws Exception;
+    CaptchaTokenBean generate(String scope, String target) throws Exception;
 
-    String generate(String scope) throws Exception;
+    CaptchaTokenBean generate(String scope) throws Exception;
 
     /**
      * @return 生成自定义验证码字符串, 若未配置自定义token生成器则返回null
@@ -93,7 +93,7 @@ public interface ICaptcha {
      * @param type   验证码类型
      * @param scope  作用域标识，用于区分不同客户端及数据存储范围
      * @param target 目标(手机号码或邮件地址)
-     * @return 返回验证码令牌对象
+     * @return 返回验证码令牌对象若不存在或已过期则重新生成
      * @throws Exception 可能产生的任何异常
      */
     CaptchaTokenBean getCaptchaToken(ICaptcha.Type type, String scope, String target) throws Exception;

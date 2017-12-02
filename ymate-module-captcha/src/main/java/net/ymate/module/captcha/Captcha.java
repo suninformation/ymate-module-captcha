@@ -120,21 +120,21 @@ public class Captcha implements IModule, ICaptcha {
     }
 
     @Override
-    public String generate(String scope, OutputStream output) throws Exception {
+    public CaptchaTokenBean generate(String scope, OutputStream output) throws Exception {
         if (__moduleCfg.isDisabled()) {
             throw new UnsupportedOperationException("Captcha module has been disabled");
         }
         String _token = __moduleCfg.getCaptchaProvider().createCaptcha(output);
-        __moduleCfg.getStorageAdapter().saveOrUpdate(scope, null, _token);
+        CaptchaTokenBean _bean = __moduleCfg.getStorageAdapter().saveOrUpdate(scope, null, _token);
         //
         if (__moduleCfg.isDevelopMode()) {
             _LOG.debug("Generate captcha['" + StringUtils.trimToEmpty(scope) + "']: " + _token);
         }
-        return _token;
+        return _bean;
     }
 
     @Override
-    public String generate(String scope, String target) throws Exception {
+    public CaptchaTokenBean generate(String scope, String target) throws Exception {
         if (__moduleCfg.isDisabled()) {
             throw new UnsupportedOperationException("Captcha module has been disabled");
         }
@@ -142,12 +142,11 @@ public class Captcha implements IModule, ICaptcha {
         if (StringUtils.isBlank(_token)) {
             _token = UUIDUtils.randomStr(__moduleCfg.getTokenLengthMin(), true);
         }
-        __moduleCfg.getStorageAdapter().saveOrUpdate(scope, target, _token);
-        return _token;
+        return __moduleCfg.getStorageAdapter().saveOrUpdate(scope, target, _token);
     }
 
     @Override
-    public String generate(String scope) throws Exception {
+    public CaptchaTokenBean generate(String scope) throws Exception {
         return generate(scope, (String) null);
     }
 
@@ -207,8 +206,7 @@ public class Captcha implements IModule, ICaptcha {
         CaptchaTokenBean _tokenBean = __moduleCfg.getStorageAdapter().load(scope);
         if (_tokenBean == null || !StringUtils.equalsIgnoreCase(_tokenBean.getTarget(), target)
                 || (__moduleCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() >= __moduleCfg.getTokenTimeout())) {
-            Captcha.get().generate(scope, target);
-            _tokenBean = __moduleCfg.getStorageAdapter().load(scope);
+            _tokenBean = generate(scope, target);
             //
             if (_tokenBean != null) {
                 if (__moduleCfg.isDevelopMode()) {
