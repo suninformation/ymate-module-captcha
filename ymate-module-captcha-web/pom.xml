@@ -7,11 +7,11 @@
     <parent>
         <artifactId>ymate-captcha-parent</artifactId>
         <groupId>net.ymate.module</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1</version>
     </parent>
 
     <artifactId>ymate-module-captcha-web</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>jar</packaging>
 
     <name>ymate-module-captcha-web</name>

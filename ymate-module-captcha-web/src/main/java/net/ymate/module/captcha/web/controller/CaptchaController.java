@@ -26,7 +26,7 @@ import net.ymate.platform.core.beans.annotation.Before;
 import net.ymate.platform.core.util.RuntimeUtils;
 import net.ymate.platform.validation.validate.VEmail;
 import net.ymate.platform.validation.validate.VLength;
-import net.ymate.platform.validation.validate.VRequried;
+import net.ymate.platform.validation.validate.VRequired;
 import net.ymate.platform.webmvc.annotation.Controller;
 import net.ymate.platform.webmvc.annotation.RequestMapping;
 import net.ymate.platform.webmvc.annotation.RequestParam;
@@ -109,7 +109,7 @@ public class CaptchaController {
     @RequestMapping(value = "/sms_code", method = Type.HttpMethod.POST)
     public IView sms(@VLength(max = 32) @RequestParam String scope,
 
-                     @VRequried @VMobile @RequestParam String mobile) throws Exception {
+                     @VRequired @VMobile @RequestParam String mobile) throws Exception {
 
         return __doCaptchaSend(ICaptcha.Type.SMS, scope, mobile);
     }
@@ -123,7 +123,7 @@ public class CaptchaController {
     @RequestMapping(value = "/mail_code", method = Type.HttpMethod.POST)
     public IView mail(@VLength(max = 32) @RequestParam String scope,
 
-                      @VRequried @VEmail @RequestParam String email) throws Exception {
+                      @VRequired @VEmail @RequestParam String email) throws Exception {
 
         return __doCaptchaSend(ICaptcha.Type.MAIL, scope, email);
     }

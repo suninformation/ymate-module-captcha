@@ -36,6 +36,8 @@ public class CaptchaStatusInterceptor implements IInterceptor {
                     return View.httpStatusView(HttpServletResponse.SC_FORBIDDEN, "Captcha module has been disabled");
                 }
                 break;
+            default:
+                break;
         }
         return null;
     }

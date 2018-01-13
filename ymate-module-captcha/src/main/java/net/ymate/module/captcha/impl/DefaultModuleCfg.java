@@ -164,9 +164,9 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
                     if (_fArr != null) {
                         int _fontStyle = Font.PLAIN;
                         if (_fArr.length > 1) {
-                            if (_fArr[1].equalsIgnoreCase("bold")) {
+                            if ("bold".equalsIgnoreCase(_fArr[1])) {
                                 _fontStyle = Font.BOLD;
-                            } else if (_fArr[1].equalsIgnoreCase("italic")) {
+                            } else if ("italic".equalsIgnoreCase(_fArr[1])) {
                                 _fontStyle = Font.ITALIC;
                             }
                         }

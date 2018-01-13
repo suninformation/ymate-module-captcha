@@ -10,11 +10,21 @@
 
 #### Maven包依赖
 
-    <dependency>
-        <groupId>net.ymate.module</groupId>
-        <artifactId>ymate-module-captcha</artifactId>
-        <version>1.0-SNAPSHOT</version>
-    </dependency>
+- 基础模块包：
+
+        <dependency>
+            <groupId>net.ymate.module</groupId>
+            <artifactId>ymate-module-captcha</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+
+- 默认Web实现包：
+
+        <dependency>
+            <groupId>net.ymate.module</groupId>
+            <artifactId>ymate-module-captcha-web</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
 #### 搭建模块工程
 
@@ -91,15 +101,15 @@
         public IView __doLogin(@VCaptcha(invalid = true)
                                @RequestParam String captcha, // 验证码
                                
-                               @VRequried
+                               @VRequired
                                @VMobile
                                @RequestParam String mobile, // 手机号码
                                
-                               @VRequried
+                               @VRequired
                                @VCaptcha(type = ICaptcha.Type.MAIL, scope = "login", targetName="mobile")
                                @RequestParam String smscode, // 短信验证码
     
-                               @VRequried
+                               @VRequired
                                @RequestParam String passwd, // 登录密码
     
                                @RequestParam(Optional.REDIRECT_URL) String redirectUrl) throws Exception {
