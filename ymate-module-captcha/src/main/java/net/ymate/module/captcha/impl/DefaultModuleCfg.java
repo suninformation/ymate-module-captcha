@@ -102,7 +102,7 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
             //
             __tokenGenerator = ClassUtils.impl(_moduleCfgs.get("token_generator_class"), ICaptchaTokenGenerator.class, this.getClass());
             //
-            __scopeProcessor = ClassUtils.impl(_moduleCfgs.get("token_processor_class"), ICaptchaScopeProcessor.class, this.getClass());
+            __scopeProcessor = ClassUtils.impl(_moduleCfgs.get("scope_processor_class"), ICaptchaScopeProcessor.class, this.getClass());
             //
             __sendProvider = ClassUtils.impl(_moduleCfgs.get("send_provider_class"), ICaptchaSendProvider.class, this.getClass());
             //
