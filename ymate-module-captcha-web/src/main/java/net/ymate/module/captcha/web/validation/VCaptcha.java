@@ -49,6 +49,11 @@ public @interface VCaptcha {
     boolean invalid() default false;
 
     /**
+     * @return 是否允许跳过
+     */
+    boolean allowSkip() default true;
+
+    /**
      * @return 自定义验证消息
      */
     String msg() default "";

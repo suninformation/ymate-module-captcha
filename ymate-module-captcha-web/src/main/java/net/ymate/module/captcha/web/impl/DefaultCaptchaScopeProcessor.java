@@ -84,6 +84,6 @@ public class DefaultCaptchaScopeProcessor implements ICaptchaScopeProcessor {
 
     @Override
     public boolean isAllowSendCode(ICaptcha.Type type, String scope, String target) {
-        return false;
+        return true;
     }
 }

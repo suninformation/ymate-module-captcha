@@ -47,11 +47,13 @@
 
 - 发送短信验证码
 
-        http://<你的域名>/captcha/sms_code?scope=<SCOPE>&mobile=<MOBILE>
+        http://<你的域名>/captcha/sms_code?scope=<SCOPE>&mobile=<MOBILE>&captcha=<CAPTCHA>
 
     > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
     >
     > mobile：手机号码，必选参数；
+    >
+    > captcha：图片验证码（通过`http://<你的域名>/captcha?scope=sms`获取）
     
     返回值说明：
     
@@ -64,11 +66,13 @@
 
 - 发送邮件验证码
 
-        http://<你的域名>/captcha/mail_code?scope=<SCOPE>&email=<EMAIL>
+        http://<你的域名>/captcha/mail_code?scope=<SCOPE>&email=<EMAIL>&captcha=<CAPTCHA>
 
     > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
     >
     > email：邮件地址，必选参数；
+    >
+    > captcha：图片验证码（通过`http://<你的域名>/captcha?scope=mail`获取）
     
     返回值说明：
     

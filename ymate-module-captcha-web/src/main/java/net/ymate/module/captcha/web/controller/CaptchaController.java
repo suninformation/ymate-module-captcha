@@ -22,8 +22,10 @@ import net.ymate.module.captcha.Captcha;
 import net.ymate.module.captcha.CaptchaTokenBean;
 import net.ymate.module.captcha.ICaptcha;
 import net.ymate.module.captcha.web.intercept.CaptchaStatusInterceptor;
+import net.ymate.module.captcha.web.validation.VCaptcha;
 import net.ymate.platform.core.beans.annotation.Before;
 import net.ymate.platform.core.util.RuntimeUtils;
+import net.ymate.platform.validation.annotation.VField;
 import net.ymate.platform.validation.validate.VEmail;
 import net.ymate.platform.validation.validate.VLength;
 import net.ymate.platform.validation.validate.VRequired;
@@ -101,13 +103,18 @@ public class CaptchaController {
     }
 
     /**
-     * @param scope  作用域标识，用于区分不同客户端及数据存储范围
-     * @param mobile 手机号码
+     * @param captcha 图片验证码
+     * @param scope   作用域标识，用于区分不同客户端及数据存储范围
+     * @param mobile  手机号码
      * @return 发送手机短信验证码, ret=0表示发送成功, ret=-1表示参数验证错误, ret=-6表示发送频率过快或其它消息, ret=-50表示发送异常
      * @throws Exception 可能产生的任何异常
      */
     @RequestMapping(value = "/sms_code", method = Type.HttpMethod.POST)
-    public IView sms(@VLength(max = 32) @RequestParam String scope,
+    public IView sms(@VCaptcha(allowSkip = false, invalid = true, scope = "sms")
+                     @VField(label = "ymp.module.captcha.field.captcha")
+                     @RequestParam String captcha,
+
+                     @VLength(max = 32) @RequestParam String scope,
 
                      @VRequired @VMobile @RequestParam String mobile) throws Exception {
 
@@ -121,7 +128,11 @@ public class CaptchaController {
      * @throws Exception 可能产生的任何异常
      */
     @RequestMapping(value = "/mail_code", method = Type.HttpMethod.POST)
-    public IView mail(@VLength(max = 32) @RequestParam String scope,
+    public IView mail(@VCaptcha(allowSkip = false, invalid = true, scope = "mail")
+                      @VField(label = "ymp.module.captcha.field.captcha")
+                      @RequestParam String captcha,
+
+                      @VLength(max = 32) @RequestParam String scope,
 
                       @VRequired @VEmail @RequestParam String email) throws Exception {
 

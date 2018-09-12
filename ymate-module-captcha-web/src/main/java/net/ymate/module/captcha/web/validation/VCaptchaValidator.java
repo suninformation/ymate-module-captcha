@@ -58,7 +58,7 @@ public class VCaptchaValidator extends AbstractValidator {
             boolean _matched = false;
             VCaptcha _vCaptcha = (VCaptcha) context.getAnnotation();
             String _scope = StringUtils.defaultIfBlank(__doGetCaptchaScope(), _vCaptcha.scope());
-            if (!Captcha.get().isValidationNeedSkip(_vCaptcha.type(), _scope)) {
+            if (!_vCaptcha.allowSkip() || !Captcha.get().isValidationNeedSkip(_vCaptcha.type(), _scope)) {
                 if (context.getParamValue() != null) {
                     String _token = null;
                     if (context.getParamValue().getClass().isArray()) {
