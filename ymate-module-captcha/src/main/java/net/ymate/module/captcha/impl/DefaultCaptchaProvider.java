@@ -59,7 +59,7 @@ public class DefaultCaptchaProvider implements ICaptchaProvider {
             _scaleCfg = new ScaleConfig(owner.getModuleCfg().getEffectScale()[0], owner.getModuleCfg().getEffectScale()[1]);
         }
         //
-        EffectConfig _effect = new EffectConfig(owner.getModuleCfg().isEffectRipple(), owner.getModuleCfg().isEffectBlur(), owner.getModuleCfg().isEffectOutline(), owner.getModuleCfg().isEffectRatale(), _scaleCfg);
+        EffectConfig _effect = new EffectConfig(owner.getModuleCfg().isEffectRipple(), owner.getModuleCfg().isEffectBlur(), owner.getModuleCfg().isEffectOutline(), owner.getModuleCfg().isEffectRotate(), _scaleCfg);
         //
         __cage = new Cage(new Painter(owner.getModuleCfg().getWidth(),
                 owner.getModuleCfg().getHeight(),

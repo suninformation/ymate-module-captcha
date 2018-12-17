@@ -15,7 +15,7 @@
         <dependency>
             <groupId>net.ymate.module</groupId>
             <artifactId>ymate-module-captcha</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
 - 默认Web实现包：
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>net.ymate.module</groupId>
             <artifactId>ymate-module-captcha-web</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
 
 #### 搭建模块工程
@@ -217,7 +217,7 @@
     ymp.configs.module.captcha.effect.outline=
     
     # 图片生成效果参数设置: 旋转, 默认值: true
-    ymp.configs.module.captcha.effect.ratale=
+    ymp.configs.module.captcha.effect.rotate=
 
 #### One More Thing
 

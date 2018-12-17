@@ -145,5 +145,5 @@ public interface ICaptchaModuleCfg {
     /**
      * @return 图片生成效果参数设置: 旋转, 默认值: true
      */
-    boolean isEffectRatale();
+    boolean isEffectRotate();
 }

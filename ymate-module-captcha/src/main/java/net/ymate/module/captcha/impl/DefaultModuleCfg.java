@@ -79,7 +79,7 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
 
     private boolean effectOutline;
 
-    private boolean effectRatale;
+    private boolean effectRotate;
 
     public DefaultModuleCfg(YMP owner) {
         Map<String, String> _moduleCfgs = owner.getConfig().getModuleConfigs(ICaptcha.MODULE_NAME);
@@ -186,7 +186,7 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
             effectRipple = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("effect.ripple"), "true")).toBooleanValue();
             effectBlur = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("effect.blur"), "true")).toBooleanValue();
             effectOutline = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("effect.outline"), "false")).toBooleanValue();
-            effectRatale = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("effect.ratale"), "true")).toBooleanValue();
+            effectRotate = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("effect.rotate"), "true")).toBooleanValue();
         }
     }
 
@@ -306,7 +306,7 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
     }
 
     @Override
-    public boolean isEffectRatale() {
-        return effectRatale;
+    public boolean isEffectRotate() {
+        return effectRotate;
     }
 }
