@@ -16,8 +16,6 @@
 package net.ymate.module.captcha.web.controller;
 
 import net.ymate.framework.validation.VMobile;
-import net.ymate.framework.webmvc.ErrorCode;
-import net.ymate.framework.webmvc.WebResult;
 import net.ymate.module.captcha.Captcha;
 import net.ymate.module.captcha.CaptchaTokenBean;
 import net.ymate.module.captcha.ICaptcha;
@@ -33,6 +31,8 @@ import net.ymate.platform.webmvc.annotation.Controller;
 import net.ymate.platform.webmvc.annotation.RequestMapping;
 import net.ymate.platform.webmvc.annotation.RequestParam;
 import net.ymate.platform.webmvc.base.Type;
+import net.ymate.platform.webmvc.util.ErrorCode;
+import net.ymate.platform.webmvc.util.WebResult;
 import net.ymate.platform.webmvc.view.IView;
 import net.ymate.platform.webmvc.view.View;
 import net.ymate.platform.webmvc.view.impl.BinaryView;
@@ -60,14 +60,14 @@ public class CaptchaController {
         if (_tokenBean != null) {
             try {
                 if (Captcha.get().captchaSend(type, scope, _tokenBean)) {
-                    return WebResult.formatView(WebResult.SUCCESS(), "json");
+                    return WebResult.formatView(WebResult.succeed(), "json");
                 }
-                return WebResult.formatView(WebResult.CODE(ErrorCode.REQUEST_OPERATION_FORBIDDEN), "json");
+                return WebResult.formatView(WebResult.create(ErrorCode.REQUEST_OPERATION_FORBIDDEN), "json");
             } catch (Exception e) {
                 _LOG.warn("An exception occurred at send to " + target, RuntimeUtils.unwrapThrow(e));
             }
         }
-        return WebResult.formatView(WebResult.CODE(ErrorCode.INTERNAL_SYSTEM_ERROR), "json");
+        return WebResult.formatView(WebResult.create(ErrorCode.INTERNAL_SYSTEM_ERROR), "json");
     }
 
     private String __doCaptchaBase64(String contentType, ByteArrayOutputStream outputStream) {
@@ -95,7 +95,7 @@ public class CaptchaController {
         if (StringUtils.equalsIgnoreCase(type, "data")) {
             return View.textView(__doCaptchaBase64(_contentType, _output));
         } else if (StringUtils.equalsIgnoreCase(type, "json")) {
-            return WebResult.SUCCESS()
+            return WebResult.succeed()
                     .dataAttr("scope", _bean.getScope())
                     .dataAttr("captcha", __doCaptchaBase64(_contentType, _output)).toJSON();
         }
@@ -153,7 +153,7 @@ public class CaptchaController {
 
                        @VLength(max = 10) @RequestParam String token) throws Exception {
 
-        return WebResult.formatView(WebResult.SUCCESS()
+        return WebResult.formatView(WebResult.succeed()
                 .dataAttr("matched", ICaptcha.Status.MATCHED.equals(Captcha.get().validate(scope, target, token, false))), "json");
     }
 }
