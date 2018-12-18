@@ -19,19 +19,19 @@ import com.github.cage.image.Painter;
 import net.ymate.module.captcha.*;
 import net.ymate.platform.core.YMP;
 import net.ymate.platform.core.lang.BlurObject;
-import net.ymate.platform.core.util.ClassUtils;
+import net.ymate.platform.core.support.IConfigReader;
+import net.ymate.platform.core.support.impl.MapSafeConfigReader;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang.StringUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * @author 刘镇 (suninformation@163.com) on 16/11/27 上午4:59
  * @version 1.0
  */
-public class DefaultModuleCfg implements ICaptchaModuleCfg {
+public class DefaultCaptchaModuleCfg implements ICaptchaModuleCfg {
 
     private final boolean __isDisabled;
 
@@ -81,49 +81,49 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
 
     private boolean effectRotate;
 
-    public DefaultModuleCfg(YMP owner) {
-        Map<String, String> _moduleCfgs = owner.getConfig().getModuleConfigs(ICaptcha.MODULE_NAME);
+    public DefaultCaptchaModuleCfg(YMP owner) {
+        IConfigReader _moduleCfg = MapSafeConfigReader.bind(owner.getConfig().getModuleConfigs(ICaptcha.MODULE_NAME));
         //
-        __isDisabled = new BlurObject(_moduleCfgs.get("disabled")).toBooleanValue();
+        __isDisabled = _moduleCfg.getBoolean(DISABLED);
 
         if (!__isDisabled) {
-            __isDevelopMode = new BlurObject(_moduleCfgs.get("dev_mode")).toBooleanValue();
+            __isDevelopMode = _moduleCfg.getBoolean(DEV_MODE);
             //
             foregrounds = new ArrayList<Color>();
             fonts = new ArrayList<Font>();
             //
-            if ((__provider = ClassUtils.impl(_moduleCfgs.get("provider_class"), ICaptchaProvider.class, this.getClass())) == null) {
+            if ((__provider = _moduleCfg.getClassImpl(PROVIDER_CLASS, ICaptchaProvider.class)) == null) {
                 __provider = new DefaultCaptchaProvider();
             }
             //
-            if ((__storageAdapter = ClassUtils.impl(_moduleCfgs.get("storage_adapter_class"), ICaptchaStorageAdapter.class, this.getClass())) == null) {
-                throw new NullArgumentException("storage_adapter_class");
+            if ((__storageAdapter = _moduleCfg.getClassImpl(STORAGE_ADAPTER_CLASS, ICaptchaStorageAdapter.class)) == null) {
+                throw new NullArgumentException(STORAGE_ADAPTER_CLASS);
             }
             //
-            __tokenGenerator = ClassUtils.impl(_moduleCfgs.get("token_generator_class"), ICaptchaTokenGenerator.class, this.getClass());
+            __tokenGenerator = _moduleCfg.getClassImpl(TOKEN_GENERATOR_CLASS, ICaptchaTokenGenerator.class);
             //
-            __scopeProcessor = ClassUtils.impl(_moduleCfgs.get("scope_processor_class"), ICaptchaScopeProcessor.class, this.getClass());
+            __scopeProcessor = _moduleCfg.getClassImpl(SCOPE_PROCESSOR_CLASS, ICaptchaScopeProcessor.class);
             //
-            __sendProvider = ClassUtils.impl(_moduleCfgs.get("send_provider_class"), ICaptchaSendProvider.class, this.getClass());
+            __sendProvider = _moduleCfg.getClassImpl(SEND_PROCESSOR_CLASS, ICaptchaSendProvider.class);
             //
-            __needCaptchaWrongTimes = BlurObject.bind(_moduleCfgs.get("need_captcha_wrong_times")).toIntValue();
+            __needCaptchaWrongTimes = _moduleCfg.getInt(NEED_CAPTCHA_WRONG_TIMES);
             if (__needCaptchaWrongTimes < 0) {
                 __needCaptchaWrongTimes = 0;
             } else if (__needCaptchaWrongTimes > 0 && __scopeProcessor == null) {
-                throw new NullArgumentException("scope_processor_class");
+                throw new NullArgumentException(SCOPE_PROCESSOR_CLASS);
             }
             //
-            __cacheNamePrefix = StringUtils.trimToEmpty(_moduleCfgs.get("cache_name_prefix"));
+            __cacheNamePrefix = _moduleCfg.getString(CACHE_NAME_PREFIX);
             //
-            tokenLengthMin = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("token_length_min"), "4")).toIntValue();
+            tokenLengthMin = _moduleCfg.getInt(TOKEN_LENGTH_MIN, 4);
             //
-            tokenTimeout = (tokenTimeout = BlurObject.bind(_moduleCfgs.get("token_timeout")).toIntValue()) <= 0 ? null : tokenTimeout;
+            tokenTimeout = (tokenTimeout = _moduleCfg.getInt(TOKEN_TIMEOUT)) <= 0 ? null : tokenTimeout;
             //
-            height = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("height"), "70")).toIntValue();
+            height = _moduleCfg.getInt(HEIGHT, 70);
             //
-            width = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("width"), "200")).toIntValue();
+            width = _moduleCfg.getInt(WIDTH, 200);
             //
-            String[] _colorsArr = StringUtils.split(_moduleCfgs.get("foregrounds"), "|");
+            String[] _colorsArr = _moduleCfg.getArray(FOREGROUNDS);
             if (_colorsArr != null) {
                 for (String _color : _colorsArr) {
                     if (_color.contains(",")) {
@@ -140,7 +140,7 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
                 }
             }
             //
-            String[] _bgColorRGB = StringUtils.split(_moduleCfgs.get("background"), ",");
+            String[] _bgColorRGB = StringUtils.split(_moduleCfg.getString(BACKGROUND), ",");
             if (_bgColorRGB != null && _bgColorRGB.length == 3) {
                 int _r = Integer.parseInt(_bgColorRGB[0]);
                 int _g = Integer.parseInt(_bgColorRGB[1]);
@@ -150,13 +150,13 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
                 }
             }
             //
-            quality = Painter.Quality.valueOf(StringUtils.defaultIfBlank(_moduleCfgs.get("quality"), "max").toUpperCase());
+            quality = Painter.Quality.valueOf(_moduleCfg.getString(QUALITY, "max").toUpperCase());
             //
-            compressRatio = (compressRatio = BlurObject.bind(_moduleCfgs.get("compress_ratio")).toFloatValue()) <= 0 ? null : compressRatio;
+            compressRatio = (compressRatio = _moduleCfg.getFloat(COMPRESS_RATIO)) <= 0 ? null : compressRatio;
             //
-            format = StringUtils.defaultIfBlank(_moduleCfgs.get("format"), "jpeg");
+            format = _moduleCfg.getString(FORMAT, "jpeg");
             //
-            String[] _fontArr = StringUtils.split(_moduleCfgs.get("fonts"), "|");
+            String[] _fontArr = _moduleCfg.getArray(FONTS);
             if (_fontArr != null) {
                 int _fontSize = height / 2;
                 for (String _font : _fontArr) {
@@ -175,7 +175,7 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
                 }
             }
             //
-            String[] _scales = StringUtils.split(_moduleCfgs.get(StringUtils.defaultIfBlank("effect.scale", "1,1")), ",");
+            String[] _scales = StringUtils.split(_moduleCfg.getString(EFFECT_SCALE, "1,1"), ",");
             if (_scales != null && _scales.length == 2) {
                 float _x = BlurObject.bind(_scales[0]).toFloatValue();
                 float _y = BlurObject.bind(_scales[1]).toFloatValue();
@@ -183,10 +183,10 @@ public class DefaultModuleCfg implements ICaptchaModuleCfg {
                     effectScale = new float[]{_x, _y};
                 }
             }
-            effectRipple = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("effect.ripple"), "true")).toBooleanValue();
-            effectBlur = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("effect.blur"), "true")).toBooleanValue();
-            effectOutline = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("effect.outline"), "false")).toBooleanValue();
-            effectRotate = BlurObject.bind(StringUtils.defaultIfBlank(_moduleCfgs.get("effect.rotate"), "true")).toBooleanValue();
+            effectRipple = _moduleCfg.getBoolean(EFFECT_RIPPLE, true);
+            effectBlur = _moduleCfg.getBoolean(EFFECT_BLUR, true);
+            effectOutline = _moduleCfg.getBoolean(EFFECT_OUTLINE, false);
+            effectRotate = _moduleCfg.getBoolean(EFFECT_ROTATE, true);
         }
     }
 

@@ -30,14 +30,10 @@ public class CaptchaStatusInterceptor implements IInterceptor {
 
     @Override
     public Object intercept(InterceptContext context) throws Exception {
-        switch (context.getDirection()) {
-            case BEFORE:
-                if (Captcha.get().isDisabled()) {
-                    return View.httpStatusView(HttpServletResponse.SC_FORBIDDEN, "Captcha module has been disabled");
-                }
-                break;
-            default:
-                break;
+        if (Direction.BEFORE.equals(context.getDirection())) {
+            if (Captcha.get().isDisabled()) {
+                return View.httpStatusView(HttpServletResponse.SC_FORBIDDEN, "Captcha module has been disabled");
+            }
         }
         return null;
     }

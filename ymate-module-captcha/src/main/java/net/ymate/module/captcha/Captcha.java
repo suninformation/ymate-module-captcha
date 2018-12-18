@@ -15,11 +15,12 @@
  */
 package net.ymate.module.captcha;
 
-import net.ymate.module.captcha.impl.DefaultModuleCfg;
+import net.ymate.module.captcha.impl.DefaultCaptchaModuleCfg;
 import net.ymate.platform.core.Version;
 import net.ymate.platform.core.YMP;
 import net.ymate.platform.core.module.IModule;
 import net.ymate.platform.core.module.annotation.Module;
+import net.ymate.platform.core.util.DateTimeUtils;
 import net.ymate.platform.core.util.UUIDUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -36,7 +37,7 @@ public class Captcha implements IModule, ICaptcha {
 
     private static final Log _LOG = LogFactory.getLog(Captcha.class);
 
-    public static final Version VERSION = new Version(1, 0, 0, Captcha.class.getPackage().getImplementationVersion(), Version.VersionType.Alphal);
+    public static final Version VERSION = new Version(1, 0, 1, Captcha.class.getPackage().getImplementationVersion(), Version.VersionType.Release);
 
     private static volatile ICaptcha __instance;
 
@@ -65,12 +66,11 @@ public class Captcha implements IModule, ICaptcha {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void init(YMP owner) throws Exception {
         if (!__inited) {
             //
             __owner = owner;
-            __moduleCfg = new DefaultModuleCfg(owner);
+            __moduleCfg = new DefaultCaptchaModuleCfg(owner);
             //
             _LOG.info("Initializing ymate-module-captcha-" + VERSION + " - debug:" + __moduleCfg.isDevelopMode());
             //
@@ -176,7 +176,7 @@ public class Captcha implements IModule, ICaptcha {
             if (token != null) {
                 CaptchaTokenBean _tokenBean = __moduleCfg.getStorageAdapter().load(scope);
                 if (_tokenBean != null) {
-                    if (__moduleCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() > __moduleCfg.getTokenTimeout() * 1000) {
+                    if (__moduleCfg.getTokenTimeout() != null && System.currentTimeMillis() - _tokenBean.getCreateTime() > __moduleCfg.getTokenTimeout() * DateTimeUtils.SECOND) {
                         _returnStatus = Status.EXPIRED;
                     } else if (StringUtils.equalsIgnoreCase(_tokenBean.getTarget(), target) && StringUtils.equalsIgnoreCase(_tokenBean.getToken(), token)) {
                         _returnStatus = Status.MATCHED;

@@ -25,6 +25,54 @@ import java.awt.*;
  */
 public interface ICaptchaModuleCfg {
 
+    String DISABLED = "disabled";
+
+    String DEV_MODE = "dev_mode";
+
+    String PROVIDER_CLASS = "provider_class";
+
+    String STORAGE_ADAPTER_CLASS = "storage_adapter_class";
+
+    String TOKEN_GENERATOR_CLASS = "token_generator_class";
+
+    String SCOPE_PROCESSOR_CLASS = "scope_processor_class";
+
+    String SEND_PROCESSOR_CLASS = "send_provider_class";
+
+    String NEED_CAPTCHA_WRONG_TIMES = "need_captcha_wrong_times";
+
+    String CACHE_NAME_PREFIX = "cache_name_prefix";
+
+    String TOKEN_LENGTH_MIN = "token_length_min";
+
+    String TOKEN_TIMEOUT = "token_timeout";
+
+    String HEIGHT = "height";
+
+    String WIDTH = "width";
+
+    String FOREGROUNDS = "foregrounds";
+
+    String BACKGROUND = "background";
+
+    String QUALITY = "quality";
+
+    String COMPRESS_RATIO = "compress_ratio";
+
+    String FORMAT = "format";
+
+    String FONTS = "fonts";
+
+    String EFFECT_SCALE = "effect.scale";
+
+    String EFFECT_RIPPLE = "effect.ripple";
+
+    String EFFECT_BLUR = "effect.blur";
+
+    String EFFECT_OUTLINE = "effect.outline";
+
+    String EFFECT_ROTATE = "effect.rotate";
+
     /**
      * @return 验证码模块是否已被禁用(禁用后将忽略所有验证码相关参数验证), 默认值: false
      */
