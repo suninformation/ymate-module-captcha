@@ -122,8 +122,9 @@ public class CaptchaController {
     }
 
     /**
-     * @param scope 作用域标识，用于区分不同客户端及数据存储范围
-     * @param email 邮箱地址
+     * @param captcha 邮件验证码
+     * @param scope   作用域标识，用于区分不同客户端及数据存储范围
+     * @param email   邮箱地址
      * @return 发送邮件验证码, ret=0表示发送成功, ret=-1表示参数验证错误, ret=-6表示发送频率过快或其它消息, ret=-50表示发送异常
      * @throws Exception 可能产生的任何异常
      */
