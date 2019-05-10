@@ -121,28 +121,32 @@ public class Captcha implements IModule, ICaptcha {
 
     @Override
     public CaptchaTokenBean generate(String scope, OutputStream output) throws Exception {
-        if (__moduleCfg.isDisabled()) {
-            throw new UnsupportedOperationException("Captcha module has been disabled");
+        if (!__moduleCfg.isDisabled()) {
+            String _token = __moduleCfg.getCaptchaProvider().createCaptcha(output);
+            CaptchaTokenBean _bean = __moduleCfg.getStorageAdapter().saveOrUpdate(scope, null, _token);
+            //
+            if (__moduleCfg.isDevelopMode() && _LOG.isDebugEnabled()) {
+                _LOG.debug("Generate captcha['" + StringUtils.trimToEmpty(scope) + "']: " + _token);
+            }
+            return _bean;
+        } else if (_LOG.isWarnEnabled()) {
+            _LOG.warn("Captcha module has been disabled.");
         }
-        String _token = __moduleCfg.getCaptchaProvider().createCaptcha(output);
-        CaptchaTokenBean _bean = __moduleCfg.getStorageAdapter().saveOrUpdate(scope, null, _token);
-        //
-        if (__moduleCfg.isDevelopMode()) {
-            _LOG.debug("Generate captcha['" + StringUtils.trimToEmpty(scope) + "']: " + _token);
-        }
-        return _bean;
+        return null;
     }
 
     @Override
     public CaptchaTokenBean generate(String scope, String target) throws Exception {
-        if (__moduleCfg.isDisabled()) {
-            throw new UnsupportedOperationException("Captcha module has been disabled");
+        if (!__moduleCfg.isDisabled()) {
+            String _token = generateToken();
+            if (StringUtils.isBlank(_token)) {
+                _token = UUIDUtils.randomStr(__moduleCfg.getTokenLengthMin(), true);
+            }
+            return __moduleCfg.getStorageAdapter().saveOrUpdate(scope, target, _token);
+        } else if (_LOG.isWarnEnabled()) {
+            _LOG.warn("Captcha module has been disabled.");
         }
-        String _token = generateToken();
-        if (StringUtils.isBlank(_token)) {
-            _token = UUIDUtils.randomStr(__moduleCfg.getTokenLengthMin(), true);
-        }
-        return __moduleCfg.getStorageAdapter().saveOrUpdate(scope, target, _token);
+        return null;
     }
 
     @Override
@@ -160,17 +164,15 @@ public class Captcha implements IModule, ICaptcha {
 
     @Override
     public void invalidate(String scope) throws Exception {
-        if (__moduleCfg.isDisabled()) {
-            throw new UnsupportedOperationException("Captcha module has been disabled");
+        if (!__moduleCfg.isDisabled()) {
+            __moduleCfg.getStorageAdapter().cleanup(scope);
+        } else if (_LOG.isWarnEnabled()) {
+            _LOG.warn("Captcha module has been disabled.");
         }
-        __moduleCfg.getStorageAdapter().cleanup(scope);
     }
 
     @Override
     public Status validate(String scope, String target, String token, boolean invalid) throws Exception {
-        if (isDisabled()) {
-            throw new UnsupportedOperationException("Captcha module has been disabled");
-        }
         Status _returnStatus = Status.INVALID;
         if (!__moduleCfg.isDisabled()) {
             if (token != null) {
@@ -183,9 +185,11 @@ public class Captcha implements IModule, ICaptcha {
                     }
                 }
             }
-            if (invalid) {
+            if (invalid || Status.MATCHED.equals(_returnStatus) || Status.EXPIRED.equals(_returnStatus)) {
                 invalidate(scope);
             }
+        } else if (_LOG.isWarnEnabled()) {
+            _LOG.warn("Captcha module has been disabled.");
         }
         return _returnStatus;
     }

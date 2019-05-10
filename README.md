@@ -15,7 +15,7 @@
         <dependency>
             <groupId>net.ymate.module</groupId>
             <artifactId>ymate-module-captcha</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
 
 - 默认Web实现包：
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>net.ymate.module</groupId>
             <artifactId>ymate-module-captcha-web</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
 
 #### 搭建模块工程
@@ -41,19 +41,19 @@
 
         http://<你的域名>/captcha?scope=<SCOPE>&type=<TYPE>
 
-    > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
+    > scope：作用域标识，用于区分不同客户端及数据存储范围，必选参数；
     >
-    > type：仅当type=data时采用Base64编码输出图片，可选参数；
+    > type：取值范围:`data|json`，采用Base64编码输出图片，默认为空，可选参数；
 
 - 发送短信验证码
 
         http://<你的域名>/captcha/sms_code?scope=<SCOPE>&mobile=<MOBILE>&captcha=<CAPTCHA>
 
-    > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
+    > scope：作用域标识，用于区分不同客户端及数据存储范围，必选参数；
     >
     > mobile：手机号码，必选参数；
     >
-    > captcha：图片验证码（通过`http://<你的域名>/captcha?scope=sms`获取）
+    > captcha：图片验证码（通过`http://<你的域名>/captcha?scope=<SCOPE>`获取）
     
     返回值说明：
     
@@ -68,11 +68,11 @@
 
         http://<你的域名>/captcha/mail_code?scope=<SCOPE>&email=<EMAIL>&captcha=<CAPTCHA>
 
-    > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
+    > scope：作用域标识，用于区分不同客户端及数据存储范围，必选参数；
     >
     > email：邮件地址，必选参数；
     >
-    > captcha：图片验证码（通过`http://<你的域名>/captcha?scope=mail`获取）
+    > captcha：图片验证码（通过`http://<你的域名>/captcha?scope=<SCOPE>`获取）
     
     返回值说明：
     
@@ -87,7 +87,7 @@
 
         http://<你的域名>/captcha/match?scope=<SCOPE>&token=<TOKEN>&target=<TARGET>
 
-    > scope：作用域标识，用于区分不同客户端及数据存储范围，可选参数；
+    > scope：作用域标识，用于区分不同客户端及数据存储范围，必选参数；
     >
     > token：预验证的令牌值，必选参数；
     >
@@ -110,7 +110,10 @@
                                @RequestParam String mobile, // 手机号码
                                
                                @VRequired
-                               @VCaptcha(type = ICaptcha.Type.MAIL, scope = "login", targetName="mobile")
+                               @RequestParam String scope, // 短信验证码作用域标识
+                               
+                               @VRequired
+                               @VCaptcha(type = ICaptcha.Type.MAIL, scopeName = "scope", targetName="mobile")
                                @RequestParam String smscode, // 短信验证码
     
                                @VRequired

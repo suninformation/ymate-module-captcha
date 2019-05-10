@@ -36,14 +36,14 @@ import org.apache.commons.lang.StringUtils;
 @CleanProxy
 public class VCaptchaValidator extends AbstractValidator {
 
-    private String __doGetCaptchaScope() {
-        // 尝试从请求参数中获取Token数据
-        String _scopeStr = WebContext.getRequest().getParameter("captcha_scope");
+    private String __doGetCaptchaScope(String scopeName) {
+        // 尝试从请求参数中获取验证码作用域
+        String _scopeStr = WebContext.getRequest().getParameter(scopeName);
         if (StringUtils.isBlank(_scopeStr)) {
-            // 尝试从请求头中获取Token数据
+            // 尝试从请求头中获取验证码作用域
             _scopeStr = WebContext.getRequest().getHeader("X-ModuleCaptcha-Scope");
             if (StringUtils.isBlank(_scopeStr)) {
-                // 最后从Cookie中获取Token数据
+                // 最后从Cookie中获取验证码作用域
                 _scopeStr = CookieHelper.bind(WebContext.getContext().getOwner())
                         .getCookie("module.captcha_scope")
                         .toStringValue();
@@ -57,7 +57,7 @@ public class VCaptchaValidator extends AbstractValidator {
         if (!Captcha.get().getModuleCfg().isDisabled()) {
             boolean _matched = false;
             VCaptcha _vCaptcha = (VCaptcha) context.getAnnotation();
-            String _scope = StringUtils.defaultIfBlank(__doGetCaptchaScope(), _vCaptcha.scope());
+            String _scope = __doGetCaptchaScope(_vCaptcha.scopeName());
             if (!_vCaptcha.allowSkip() || !Captcha.get().isValidationNeedSkip(_vCaptcha.type(), _scope)) {
                 if (context.getParamValue() != null) {
                     String _token = null;

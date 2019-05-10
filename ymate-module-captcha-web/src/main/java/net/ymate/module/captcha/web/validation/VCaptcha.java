@@ -30,8 +30,15 @@ public @interface VCaptcha {
 
     /**
      * @return 作用域标识
+     * @see VCaptcha#scopeName
+     * @deprecated 不推荐使用，容易产生歧义
      */
     String scope() default "";
+
+    /**
+     * @return 作用域标识参数名称
+     */
+    String scopeName() default "captcha_scope";
 
     /**
      * @return 验证码类型

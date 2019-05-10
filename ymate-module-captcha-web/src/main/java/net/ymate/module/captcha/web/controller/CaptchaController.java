@@ -110,7 +110,7 @@ public class CaptchaController {
      * @throws Exception 可能产生的任何异常
      */
     @RequestMapping(value = "/sms_code", method = Type.HttpMethod.POST)
-    public IView sms(@VCaptcha(allowSkip = false, invalid = true, scope = "sms")
+    public IView sms(@VCaptcha(allowSkip = false, invalid = true, scopeName = "scope")
                      @VField(label = "ymp.module.captcha.field.captcha")
                      @RequestParam String captcha,
 
@@ -129,7 +129,7 @@ public class CaptchaController {
      * @throws Exception 可能产生的任何异常
      */
     @RequestMapping(value = "/mail_code", method = Type.HttpMethod.POST)
-    public IView mail(@VCaptcha(allowSkip = false, invalid = true, scope = "mail")
+    public IView mail(@VCaptcha(allowSkip = false, invalid = true, scopeName = "scope")
                       @VField(label = "ymp.module.captcha.field.captcha")
                       @RequestParam String captcha,
 
