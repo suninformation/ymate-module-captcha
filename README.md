@@ -204,7 +204,13 @@
     # 图片格式, 可选值: png|jpeg, 默认: jpeg
     ymp.configs.module.captcha.format=
     
+    # 自定义字体配置分析器, 可选参数, 默认值: net.ymate.module.captcha.impl.DefaultCaptchaFontsParser
+    # 若希望通过指定文件加载字体, 请使用: net.ymate.module.captcha.impl.FileCaptchaFontsParser
+    # 或通过实现net.ymate.module.captcha.ICaptchaFontsParser接口自定义加载方式
+    ymp.configs.module.captcha.fonts_parser_class=
+    
     # 自定义字体, 可选参数, 如: SansSerif,plain|Serif,bold|Monospaced,plain, 多个字体用'|'分隔, 默认: 随机
+    # 当自定义字体配置分析器为通过文件加载时, 配置格式: 0,${root}/fonts/SansSerif.ttf|...|1,/opt/share/Monospaced.ttf, 其中的0和1分别表示字体类型为TRUETYPE和TYPE1
     ymp.configs.module.captcha.fonts=
     
     # 图片生成效果参数设置: 缩放, 取值范围: [0-1, 0-1], 默认: 1,1

@@ -61,6 +61,8 @@ public interface ICaptchaModuleCfg {
 
     String FORMAT = "format";
 
+    String FONTS_PARSER_CLASS = "fonts_parser_class";
+
     String FONTS = "fonts";
 
     String EFFECT_SCALE = "effect.scale";

@@ -26,6 +26,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author 刘镇 (suninformation@163.com) on 16/11/27 上午4:59
@@ -81,7 +82,7 @@ public class DefaultCaptchaModuleCfg implements ICaptchaModuleCfg {
 
     private boolean effectRotate;
 
-    public DefaultCaptchaModuleCfg(YMP owner) {
+    public DefaultCaptchaModuleCfg(YMP owner) throws Exception {
         IConfigReader _moduleCfg = MapSafeConfigReader.bind(owner.getConfig().getModuleConfigs(ICaptcha.MODULE_NAME));
         //
         __isDisabled = _moduleCfg.getBoolean(DISABLED);
@@ -156,23 +157,13 @@ public class DefaultCaptchaModuleCfg implements ICaptchaModuleCfg {
             //
             format = _moduleCfg.getString(FORMAT, "jpeg");
             //
-            String[] _fontArr = _moduleCfg.getArray(FONTS);
-            if (_fontArr != null) {
-                int _fontSize = height / 2;
-                for (String _font : _fontArr) {
-                    String[] _fArr = StringUtils.split(_font, ",");
-                    if (_fArr != null) {
-                        int _fontStyle = Font.PLAIN;
-                        if (_fArr.length > 1) {
-                            if ("bold".equalsIgnoreCase(_fArr[1])) {
-                                _fontStyle = Font.BOLD;
-                            } else if ("italic".equalsIgnoreCase(_fArr[1])) {
-                                _fontStyle = Font.ITALIC;
-                            }
-                        }
-                        fonts.add(new Font(_fArr[0], _fontStyle, _fontSize));
-                    }
-                }
+            ICaptchaFontsParser fontsParser = _moduleCfg.getClassImpl(FONTS_PARSER_CLASS, DefaultCaptchaFontsParser.class.getName(), ICaptchaFontsParser.class);
+            if (fontsParser == null) {
+                fontsParser = new DefaultCaptchaFontsParser();
+            }
+            List<Font> fontList = fontsParser.parse(_moduleCfg, height / 2);
+            if (!fontList.isEmpty()) {
+                fonts.addAll(fontList);
             }
             //
             String[] _scales = StringUtils.split(_moduleCfg.getString(EFFECT_SCALE, "1,1"), ",");
