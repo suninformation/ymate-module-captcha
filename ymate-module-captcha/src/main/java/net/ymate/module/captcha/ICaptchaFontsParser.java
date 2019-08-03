@@ -22,7 +22,7 @@ import java.util.List;
 
 /**
  * @author 刘镇 (suninformation@163.com) on 2019-08-02 23:56
- * @since 1.0.3
+ * @since 1.0.2
  */
 public interface ICaptchaFontsParser {
 

@@ -26,7 +26,7 @@ import java.util.List;
 
 /**
  * @author 刘镇 (suninformation@163.com) on 2019-08-03 00:02
- * @since 1.0.3
+ * @since 1.0.2
  */
 public class DefaultCaptchaFontsParser implements ICaptchaFontsParser {
 
