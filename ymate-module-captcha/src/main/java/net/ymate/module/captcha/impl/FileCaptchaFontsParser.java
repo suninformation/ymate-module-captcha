@@ -17,7 +17,6 @@ package net.ymate.module.captcha.impl;
 
 import net.ymate.module.captcha.ICaptchaFontsParser;
 import net.ymate.module.captcha.ICaptchaModuleCfg;
-import net.ymate.platform.core.lang.BlurObject;
 import net.ymate.platform.core.support.IConfigReader;
 import net.ymate.platform.core.util.RuntimeUtils;
 import org.apache.commons.lang.StringUtils;
@@ -33,6 +32,22 @@ import java.util.List;
  */
 public class FileCaptchaFontsParser implements ICaptchaFontsParser {
 
+    private int parseFontFormat(String fontFormat) {
+        if ("bold".equalsIgnoreCase(fontFormat)) {
+            return Font.BOLD;
+        } else if ("italic".equalsIgnoreCase(fontFormat)) {
+            return Font.ITALIC;
+        }
+        return Font.PLAIN;
+    }
+
+    private int parseFontStyle(String fontStyle) {
+        if ("type1".equalsIgnoreCase(fontStyle)) {
+            return Font.TYPE1_FONT;
+        }
+        return Font.TRUETYPE_FONT;
+    }
+
     @Override
     public List<Font> parse(IConfigReader configReader, int fontSize) throws Exception {
         List<Font> fonts = new ArrayList<Font>();
@@ -42,12 +57,27 @@ public class FileCaptchaFontsParser implements ICaptchaFontsParser {
                 String[] _fArr = StringUtils.split(_fontPath, ",");
                 if (_fArr != null) {
                     int _fontFormat = Font.TRUETYPE_FONT;
-                    if (_fArr.length > 1) {
-                        _fontFormat = BlurObject.bind(_fArr[0]).toIntValue();
-                        _fontPath = _fArr[1];
+                    int _fontStyle = Font.PLAIN;
+                    switch (_fArr.length) {
+                        case 1:
+                            _fontPath = _fArr[0];
+                            break;
+                        case 2:
+                            _fontFormat = parseFontFormat(_fArr[0]);
+                            _fontPath = _fArr[1];
+                            break;
+                        case 3:
+                            _fontFormat = parseFontFormat(_fArr[0]);
+                            _fontStyle = parseFontStyle(_fArr[1]);
+                            _fontPath = _fArr[2];
+                            break;
+                        default:
+                            throw new IllegalArgumentException(String.format("Illegal argument '%s'.", ICaptchaModuleCfg.FONTS));
                     }
-                    _fontPath = RuntimeUtils.replaceEnvVariable(_fontPath);
-                    fonts.add(Font.createFont(_fontFormat, new File(_fontPath)).deriveFont(fontSize));
+                    if (StringUtils.isNotBlank(_fontPath)) {
+                        _fontPath = RuntimeUtils.replaceEnvVariable(_fontPath);
+                        fonts.add(Font.createFont(_fontFormat, new File(_fontPath)).deriveFont(_fontStyle, fontSize));
+                    }
                 }
             }
         }

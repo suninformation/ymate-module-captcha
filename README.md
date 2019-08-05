@@ -209,8 +209,8 @@
     # 或通过实现net.ymate.module.captcha.ICaptchaFontsParser接口自定义加载方式
     ymp.configs.module.captcha.fonts_parser_class=
     
-    # 自定义字体, 可选参数, 如: SansSerif,plain|Serif,bold|Monospaced,plain, 多个字体用'|'分隔, 默认: 随机
-    # 当自定义字体配置分析器为通过文件加载时, 配置格式: 0,${root}/fonts/SansSerif.ttf|...|1,/opt/share/Monospaced.ttf, 其中的0和1分别表示字体类型为TRUETYPE和TYPE1
+    # 自定义字体, 可选参数, 格式: [字体名称:SansSerif],[字体样式:plain|bold|italic], 多个字体用'|'分隔, 默认: 随机
+    # 当自定义字体配置分析器为通过文件加载时, 配置格式: [字体格式:type1|truetype],[字体样式:plain|bold|italic],<文件路径:${root}/fonts/SansSerif.ttf>, 多个字体用'|'分隔
     ymp.configs.module.captcha.fonts=
     
     # 图片生成效果参数设置: 缩放, 取值范围: [0-1, 0-1], 默认: 1,1
