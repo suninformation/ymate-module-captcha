@@ -10,32 +10,15 @@
 
 #### Maven包依赖
 
-- 基础模块包：
-
         <dependency>
             <groupId>net.ymate.module</groupId>
             <artifactId>ymate-module-captcha</artifactId>
-            <version>1.0.2</version>
+            <version>2.0.0</version>
         </dependency>
-
-- 默认Web实现包：
-
-        <dependency>
-            <groupId>net.ymate.module</groupId>
-            <artifactId>ymate-module-captcha-web</artifactId>
-            <version>1.0.2</version>
-        </dependency>
-
-#### 搭建模块工程
-
-- 首先，你需要创建一个基于YMPv2框架的JavaWeb工程项目；（[如何快速搭建工程?](https://gitee.com/suninformation/ymate-platform-v2/wikis/Quickstart_New)）
-
-- YMP框架扫描包路径要包含`net.ymate.module.captcha`, 调整配置如下:
-
-        # 框架自动扫描的包路径集合，多个包名之间用'|'分隔，默认已包含net.ymate.platform包，其子包也将被扫描
-        ymp.autoscan_packages=net.ymate
 
 #### 使用方法说明
+
+在Web环境下，当配置`service_enabled=true`时，模块将在初始化时注册默认验证码控制器，该控制器提供一下接口能力：
 
 - 获取验证码图片
 
@@ -59,10 +42,10 @@
     
         {ret: 0}
     
-    > - `ret=0` 表示发送成功
-    > - `ret=-1` 表示参数验证错误
-    > - `ret=-6` 表示发送频率过快或其它消息
-    > - `ret=-50` 表示发送异常
+    > - `0` 表示发送成功
+    > - `-1` 表示参数验证错误
+    > - `-6` 表示发送频率过快或其它消息
+    > - `-50` 表示发送异常
 
 - 发送邮件验证码
 
@@ -78,10 +61,10 @@
     
         {ret: 0}
     
-    > - `ret=0` 表示发送成功
-    > - `ret=-1` 表示参数验证错误
-    > - `ret=-6` 表示发送频率过快或其它消息
-    > - `ret=-50` 表示发送异常
+    > - `0` 表示发送成功
+    > - `-1` 表示参数验证错误
+    > - `-6` 表示发送频率过快或其它消息
+    > - `-50` 表示发送异常
 
 - 检查验证码是否合法
 
@@ -100,34 +83,34 @@
 #### 示例代码：
 
 - 验证码注解`@VCaptcha`的使用
-    
+
         @RequestMapping(value = "/login", method = Type.HttpMethod.POST)
-        public IView __doLogin(@VCaptcha(invalid = true)
-                               @RequestParam String captcha, // 验证码
-                               
-                               @VRequired
-                               @VMobile
-                               @RequestParam String mobile, // 手机号码
-                               
-                               @VRequired
-                               @RequestParam String scope, // 短信验证码作用域标识
-                               
-                               @VRequired
-                               @VCaptcha(type = ICaptcha.Type.MAIL, scopeName = "scope", targetName="mobile")
-                               @RequestParam String smscode, // 短信验证码
-    
-                               @VRequired
-                               @RequestParam String passwd, // 登录密码
-    
-                               @RequestParam(Optional.REDIRECT_URL) String redirectUrl) throws Exception {
+        public IView login(@VCaptcha(invalid = true)
+                           @RequestParam String captcha, // 验证码
+
+                           @VRequired
+                           @VMobile
+                           @RequestParam String mobile, // 手机号码
+
+                           @VRequired
+                           @RequestParam String scope, // 短信验证码作用域标识
+
+                           @VRequired
+                           @VCaptcha(type = ICaptcha.Type.MAIL, scopeName = "scope", targetName="mobile")
+                           @RequestParam String smscode, // 短信验证码
+
+                           @VRequired
+                           @RequestParam String passwd, // 登录密码
+
+                           @RequestParam(Optional.REDIRECT_URL) String redirectUrl) throws Exception {
             // ...... 省略
-            return WebResult.SUCCESS().toJSON();
+            return WebResult.success().toJsonView();
         }
 
 - 验证码相关方法调用
 
         // 生成作用域为user.login的验证码
-        String _code = Captcha.get().generate("user.login");
+        String code = Captcha.get().generate("user.login");
 
         // 销毁作用域为user.login的验证码
         Captcha.get().invalidate("user.login");
@@ -142,7 +125,7 @@
         Captcha.get().resetWrongTimes(ICaptcha.Type.DEFAULT, "user.login");
 
         // 验证作用域为user.login的验证码是否匹配以及验证后是否使其失效
-        Captcha.get().validate("user.login", _code, true);
+        Captcha.get().validate("user.login", code, true);
 
 #### 模块配置参数说明
 
@@ -150,11 +133,14 @@
     # module.captcha 模块初始化参数
     #-------------------------------------
     
-    # 验证码模块是否已被禁用(禁用后将忽略所有验证码相关参数验证), 默认值: false
-    ymp.configs.module.captcha.disabled=
+    # 验证码模块模块是否已启用(禁用后将忽略所有验证码相关参数验证), 默认值: true
+    ymp.configs.module.captcha.enabled=
     
     # 是否开启调试模式(调试模式下控制台将输出生成的验证码, 同时短信验证码也不会被真正发送), 默认值: false
     ymp.configs.module.captcha.dev_mode=
+    
+    # 开启验证码类型, 取值范围: ALL|DEFAULT|SMS|MAIL, 默认值: ALL
+    ymp.configs.module.captcha.captcha_types=
     
     # 验证码服务提供者类, 默认值: net.ymate.module.captcha.impl.DefaultCaptchaProvider
     ymp.configs.module.captcha.provider_class=
@@ -162,13 +148,13 @@
     # 自定义验证码生成器类, 默认值: 空
     ymp.configs.module.captcha.token_generator_class=
     
-    # 验证码存储适配器类, 必须, 默认值: 空
+    # 验证码存储适配器类, 默认值: net.ymate.module.captcha.impl.DefaultCaptchaStorageAdapter
     ymp.configs.module.captcha.storage_adapter_class=
     
     # 作用域标识扩展处理器, 开启错误记数时为必须, 默认值: 空
     ymp.configs.module.captcha.scope_processor_class=
     
-    # 手机短信或邮件验证码发送服务提供者类, 默认值: 空
+    # 手机短信或邮件验证码发送服务提供者类, 默认值: net.ymate.module.captcha.impl.DefaultCaptchaSendProvider
     ymp.configs.module.captcha.send_provider_class=
     
     # 设置在达到指定错误次数上限后开启验证码, 默认值: 0, 表示不开启错误记数特性
@@ -182,6 +168,12 @@
     
     # 验证码超时时间, 单位: 秒, 默认: 空, 空或小于等于0均表示不限制
     ymp.configs.module.captcha.token_timeout=
+    
+    # 默认验证码控制器服务请求映射前缀(不允许'/'开始和结束), 默认值: ""
+    ymp.configs.module.captcha.service_prefix=
+    
+    # 是否注册默认验证码控制器, 默认值: false
+    ymp.configs.module.captcha.service_enabled=
     
     # 高度, 默认: 70px
     ymp.configs.module.captcha.height=
