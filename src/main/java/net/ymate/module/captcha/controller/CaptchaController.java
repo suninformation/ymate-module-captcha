@@ -94,7 +94,7 @@ public class CaptchaController {
             return View.textView(buildCaptchaBase64(contentType, outputStream));
         } else if (StringUtils.equalsIgnoreCase(type, TYPE_JSON)) {
             return WebResult.succeed()
-                    .dataAttr("scope", tokenBean.getScope())
+                    .dataAttr("scope", tokenBean != null ? tokenBean.getScope() : null)
                     .dataAttr("captcha", buildCaptchaBase64(contentType, outputStream)).withContentType().toJsonView();
         }
         return new BinaryView(new ByteArrayInputStream(outputStream.toByteArray()), outputStream.size()).setContentType(contentType);

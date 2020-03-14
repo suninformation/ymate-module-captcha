@@ -33,7 +33,7 @@ public class CaptchaTokenBean implements Serializable {
     /**
      * 令牌
      */
-    private String token;
+    private final String token;
 
     /**
      * 作用域
@@ -43,12 +43,12 @@ public class CaptchaTokenBean implements Serializable {
     /**
      * 验证码状态
      */
-    private ICaptcha.Status status = ICaptcha.Status.NORMAL;
+    private final ICaptcha.Status status = ICaptcha.Status.NORMAL;
 
     /**
      * 验证码生成时间
      */
-    private long createTime = System.currentTimeMillis();
+    private final long createTime = System.currentTimeMillis();
 
     public CaptchaTokenBean(String token) {
         if (StringUtils.isBlank(token)) {

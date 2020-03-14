@@ -37,7 +37,7 @@ public final class DefaultCaptchaConfig implements ICaptchaConfig {
 
     private boolean developMode;
 
-    private Set<ICaptcha.Type> captchaTypes = new HashSet<>();
+    private final Set<ICaptcha.Type> captchaTypes = new HashSet<>();
 
     private ICaptchaProvider captchaProvider;
 
@@ -65,7 +65,7 @@ public final class DefaultCaptchaConfig implements ICaptchaConfig {
 
     private int width;
 
-    private List<Color> foregrounds = new ArrayList<>();
+    private final List<Color> foregrounds = new ArrayList<>();
 
     private Color background;
 
@@ -75,7 +75,7 @@ public final class DefaultCaptchaConfig implements ICaptchaConfig {
 
     private String format;
 
-    private List<Font> fonts = new ArrayList<>();
+    private final List<Font> fonts = new ArrayList<>();
 
     private float[] effectScale;
 
