@@ -188,12 +188,12 @@ public final class Captcha implements IModule, ICaptcha {
     @Override
     public Status validate(String scope, String target, String token, boolean invalid) throws Exception {
         Status returnStatus = Status.INVALID;
-        if (token != null) {
+        if (StringUtils.isNotBlank(token)) {
             CaptchaTokenBean tokenBean = config.getStorageAdapter().load(scope);
             if (tokenBean != null) {
                 if (config.getTokenTimeout() > 0 && System.currentTimeMillis() - tokenBean.getCreateTime() > config.getTokenTimeout() * DateTimeUtils.SECOND) {
                     returnStatus = Status.EXPIRED;
-                } else if (StringUtils.equalsIgnoreCase(tokenBean.getTarget(), target) && StringUtils.equalsIgnoreCase(tokenBean.getToken(), token)) {
+                } else if (StringUtils.equalsIgnoreCase(StringUtils.trimToNull(tokenBean.getTarget()), StringUtils.trimToNull(target)) && StringUtils.equalsIgnoreCase(tokenBean.getToken(), token)) {
                     returnStatus = Status.MATCHED;
                 }
             }
