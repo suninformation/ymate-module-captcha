@@ -57,12 +57,13 @@ public interface ICaptcha extends IInitialization<IApplication>, IDestroyable {
     /**
      * 生成验证码
      *
+     * @param type   验证码类型
      * @param scope  作用域标识，用于区分不同客户端及数据存储范围
      * @param target 目标(当验证手机号码或邮件地址时使用)
      * @return 返回验证码令牌对象
      * @throws Exception 可能产生的任何异常
      */
-    CaptchaTokenBean generate(String scope, String target) throws Exception;
+    CaptchaTokenBean generate(Type type, String scope, String target) throws Exception;
 
     /**
      * 生成验证码
@@ -76,9 +77,10 @@ public interface ICaptcha extends IInitialization<IApplication>, IDestroyable {
     /**
      * 生成自定义验证码字符串
      *
+     * @param type 验证码类型
      * @return 返回验证码字符串(若未配置自定义验证码生成器则返回null)
      */
-    String generateToken();
+    String generateToken(Type type);
 
     /**
      * 清除验证码数据

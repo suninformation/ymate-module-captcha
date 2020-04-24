@@ -80,7 +80,7 @@ public class DefaultCaptchaProvider implements ICaptchaProvider {
 
     @Override
     public String createCaptcha(OutputStream output) throws Exception {
-        String tokenStr = owner.generateToken();
+        String tokenStr = owner.generateToken(ICaptcha.Type.DEFAULT);
         if (StringUtils.isBlank(tokenStr)) {
             tokenStr = cage.getTokenGenerator().next();
         }

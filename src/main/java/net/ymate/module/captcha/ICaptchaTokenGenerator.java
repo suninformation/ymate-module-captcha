@@ -29,7 +29,8 @@ public interface ICaptchaTokenGenerator extends IInitialization<ICaptcha> {
     /**
      * 生成验证码
      *
+     * @param type 验证码类型
      * @return 返回生成的验证码字符串
      */
-    String generate();
+    String generate(ICaptcha.Type type);
 }

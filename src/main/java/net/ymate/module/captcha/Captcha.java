@@ -159,23 +159,28 @@ public final class Captcha implements IModule, ICaptcha {
     }
 
     @Override
-    public CaptchaTokenBean generate(String scope, String target) throws Exception {
-        String tokenStr = generateToken();
+    public CaptchaTokenBean generate(Type type, String scope, String target) throws Exception {
+        if ((Type.MAIL.equals(type) || Type.SMS.equals(type)) && StringUtils.isBlank(target)) {
+            throw new IllegalArgumentException("When the type value is EMAIL or SMS, the parameter target is required.");
+        }
+        String tokenStr = generateToken(type);
         if (StringUtils.isBlank(tokenStr)) {
-            tokenStr = UUIDUtils.randomStr(config.getTokenLengthMin(), true);
+            tokenStr = UUIDUtils.randomStr(config.getTokenLengthMin(), Type.SMS.equals(type));
         }
         return config.getStorageAdapter().saveOrUpdate(scope, target, tokenStr);
     }
 
     @Override
     public CaptchaTokenBean generate(String scope) throws Exception {
-        return generate(scope, (String) null);
+        return generate(Type.DEFAULT, scope, null);
     }
 
     @Override
-    public String generateToken() {
-        if (config.getTokenGenerator() != null) {
-            return config.getTokenGenerator().generate();
+    public String generateToken(Type type) {
+        if (checkType(type)) {
+            if (config.getTokenGenerator() != null) {
+                return config.getTokenGenerator().generate(type);
+            }
         }
         return null;
     }
@@ -215,7 +220,7 @@ public final class Captcha implements IModule, ICaptcha {
         CaptchaTokenBean tokenBean = config.getStorageAdapter().load(scope);
         if (tokenBean == null || !StringUtils.equalsIgnoreCase(tokenBean.getTarget(), target)
                 || (config.getTokenTimeout() > 0 && System.currentTimeMillis() - tokenBean.getCreateTime() >= config.getTokenTimeout())) {
-            tokenBean = generate(scope, target);
+            tokenBean = generate(type, scope, target);
             if (tokenBean != null && config.isDevelopMode() && LOG.isDebugEnabled()) {
                 LOG.debug(String.format("Generate captcha['%s']: %s%s", scope, tokenBean.getToken(), canSend ? StringUtils.EMPTY : " - Not send."));
             }
