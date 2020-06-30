@@ -216,19 +216,18 @@ public final class Captcha implements IModule, ICaptcha {
 
     @Override
     public CaptchaTokenBean getCaptchaToken(Type type, String scope, String target) throws Exception {
-        boolean canSend = isCanSend(type, scope, target);
         CaptchaTokenBean tokenBean = config.getStorageAdapter().load(scope);
         if (tokenBean == null || !StringUtils.equalsIgnoreCase(tokenBean.getTarget(), target)
                 || (config.getTokenTimeout() > 0 && System.currentTimeMillis() - tokenBean.getCreateTime() >= config.getTokenTimeout())) {
             tokenBean = generate(type, scope, target);
             if (tokenBean != null && config.isDevelopMode() && LOG.isDebugEnabled()) {
-                LOG.debug(String.format("Generate captcha['%s']: %s%s", scope, tokenBean.getToken(), canSend ? StringUtils.EMPTY : " - Not send."));
+                LOG.debug(String.format("Generate captcha['%s']: %s", scope, tokenBean.getToken()));
             }
         }
-        return tokenBean == null || !canSend ? null : tokenBean;
+        return tokenBean;
     }
 
-    private boolean isCanSend(Type type, String scope, String target) {
+    public boolean isCanSend(Type type, String scope, String target) {
         boolean canSend = true;
         if (config.getScopeProcessor() != null) {
             canSend = config.getScopeProcessor().isAllowSendCode(type, scope, target);
@@ -238,8 +237,7 @@ public final class Captcha implements IModule, ICaptcha {
 
     @Override
     public boolean captchaSend(Type type, String scope, CaptchaTokenBean tokenBean) throws Exception {
-        boolean canSend = isCanSend(type, scope, tokenBean.getTarget());
-        if (canSend && !Type.DEFAULT.equals(type) && checkType(type)) {
+        if (!Type.DEFAULT.equals(type) && checkType(type)) {
             if (!config.isDevelopMode()) {
                 config.getSendProvider().send(type, scope, tokenBean.getTarget(), tokenBean.getToken());
             }

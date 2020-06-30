@@ -58,6 +58,10 @@ public class CaptchaController {
     private Captcha captcha;
 
     private IView sendCaptcha(ICaptcha.Type type, String scope, String target) throws Exception {
+        boolean canSend = captcha.isCanSend(type, scope, target);
+        if (!canSend) {
+            return WebResult.create(WebErrorCode.requestOperationForbidden()).withContentType().toJsonView();
+        }
         CaptchaTokenBean tokenBean = captcha.getCaptchaToken(type, scope, target);
         if (tokenBean != null) {
             try {

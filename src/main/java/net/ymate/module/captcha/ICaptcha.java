@@ -125,7 +125,7 @@ public interface ICaptcha extends IInitialization<IApplication>, IDestroyable {
     CaptchaTokenBean getCaptchaToken(ICaptcha.Type type, String scope, String target) throws Exception;
 
     /**
-     * 发送验证码
+     * 发送验证码（若发送短信等需要产生额外费用的验证码时，请先通过canSend方法验证是否允许发送）
      *
      * @param type      验证码类型
      * @param scope     作用域标识，用于区分不同客户端及数据存储范围
@@ -134,6 +134,16 @@ public interface ICaptcha extends IInitialization<IApplication>, IDestroyable {
      * @throws Exception 可能产生的任何异常
      */
     boolean captchaSend(ICaptcha.Type type, String scope, CaptchaTokenBean tokenBean) throws Exception;
+
+    /**
+     * 判断是否允许发送验证码
+     *
+     * @param type   验证码类型
+     * @param scope  作用域标识，用于区分不同客户端及数据存储范围
+     * @param target 目标(手机号码或邮件地址)
+     * @return 返回true表示允许发送验证码
+     */
+    boolean isCanSend(Type type, String scope, String target);
 
     /**
      * 检查指定验证码类型是否开启
