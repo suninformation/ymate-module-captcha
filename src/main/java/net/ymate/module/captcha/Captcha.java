@@ -227,6 +227,7 @@ public final class Captcha implements IModule, ICaptcha {
         return tokenBean;
     }
 
+    @Override
     public boolean isCanSend(Type type, String scope, String target) {
         boolean canSend = true;
         if (config.getScopeProcessor() != null) {
