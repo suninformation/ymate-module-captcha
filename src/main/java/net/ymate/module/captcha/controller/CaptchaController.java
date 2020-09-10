@@ -60,22 +60,22 @@ public class CaptchaController {
     private IView sendCaptcha(ICaptcha.Type type, String scope, String target) throws Exception {
         boolean canSend = captcha.isCanSend(type, scope, target);
         if (!canSend) {
-            return WebResult.create(WebErrorCode.requestOperationForbidden()).withContentType().toJsonView();
+            return WebResult.builder(WebErrorCode.requestOperationForbidden()).build().withContentType().toJsonView();
         }
         CaptchaTokenBean tokenBean = captcha.getCaptchaToken(type, scope, target);
         if (tokenBean != null) {
             try {
                 if (captcha.captchaSend(type, scope, tokenBean)) {
-                    return WebResult.succeed().withContentType().toJsonView();
+                    return WebResult.builder().succeed().build().withContentType().toJsonView();
                 }
-                return WebResult.create(WebErrorCode.requestOperationForbidden()).withContentType().toJsonView();
+                return WebResult.builder(WebErrorCode.requestOperationForbidden()).build().withContentType().toJsonView();
             } catch (Exception e) {
                 if (LOG.isWarnEnabled()) {
                     LOG.warn(String.format("An exception occurred at send to %s", target), RuntimeUtils.unwrapThrow(e));
                 }
             }
         }
-        return WebResult.create(ErrorCode.internalSystemError()).withContentType().toJsonView();
+        return WebResult.builder(ErrorCode.internalSystemError()).build().withContentType().toJsonView();
     }
 
     private String buildCaptchaBase64(String contentType, ByteArrayOutputStream outputStream) {
@@ -97,9 +97,9 @@ public class CaptchaController {
         if (StringUtils.equalsIgnoreCase(type, TYPE_DATA)) {
             return View.textView(buildCaptchaBase64(contentType, outputStream));
         } else if (StringUtils.equalsIgnoreCase(type, TYPE_JSON)) {
-            return WebResult.succeed()
+            return WebResult.builder().succeed()
                     .dataAttr("scope", tokenBean != null ? tokenBean.getScope() : null)
-                    .dataAttr("captcha", buildCaptchaBase64(contentType, outputStream)).withContentType().toJsonView();
+                    .dataAttr("captcha", buildCaptchaBase64(contentType, outputStream)).build().withContentType().toJsonView();
         }
         return new BinaryView(new ByteArrayInputStream(outputStream.toByteArray()), outputStream.size()).setContentType(contentType);
     }
@@ -159,6 +159,6 @@ public class CaptchaController {
 
                        @VRequired @VLength(max = 10) @RequestParam String token) throws Exception {
 
-        return WebResult.succeed().dataAttr("matched", ICaptcha.Status.MATCHED.equals(captcha.validate(scope, target, token, false))).withContentType().toJsonView();
+        return WebResult.builder().succeed().dataAttr("matched", ICaptcha.Status.MATCHED.equals(captcha.validate(scope, target, token, false))).build().withContentType().toJsonView();
     }
 }

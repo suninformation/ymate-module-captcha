@@ -611,6 +611,16 @@ public final class DefaultCaptchaConfig implements ICaptchaConfig {
             return this;
         }
 
+        public Builder servicePrefix(String servicePrefix) {
+            config.setServicePrefix(servicePrefix);
+            return this;
+        }
+
+        public Builder serviceEnabled(boolean serviceEnabled) {
+            config.setServiceEnabled(serviceEnabled);
+            return this;
+        }
+
         public Builder height(int height) {
             config.setHeight(height);
             return this;

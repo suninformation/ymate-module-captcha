@@ -98,6 +98,16 @@ public final class DefaultCaptchaConfigurable extends DefaultModuleConfigurable 
             return this;
         }
 
+        public Builder servicePrefix(String servicePrefix) {
+            configurable.addConfig(ICaptchaConfig.SERVICE_PREFIX, servicePrefix);
+            return this;
+        }
+
+        public Builder serviceEnabled(boolean serviceEnabled) {
+            configurable.addConfig(ICaptchaConfig.SERVICE_ENABLED, String.valueOf(serviceEnabled));
+            return this;
+        }
+
         public Builder tokenLengthMin(int tokenLengthMin) {
             configurable.addConfig(ICaptchaConfig.TOKEN_LENGTH_MIN, String.valueOf(tokenLengthMin));
             return this;
