@@ -90,7 +90,7 @@ public class CaptchaController {
      */
     @RequestMapping("/")
     @CaptchaStatusCheck(type = ICaptcha.Type.DEFAULT)
-    public IView create(@VRequired @VLength(max = 32) @RequestParam String scope, @RequestParam @VDataRange({TYPE_DATA, TYPE_JSON}) String type) throws Exception {
+    public IView create(@VRequired @VLength(max = 64) @RequestParam String scope, @RequestParam @VDataRange({TYPE_DATA, TYPE_JSON}) String type) throws Exception {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         CaptchaTokenBean tokenBean = captcha.generate(scope, outputStream);
         String contentType = String.format("image/%s", captcha.getConfig().getFormat());
@@ -117,7 +117,7 @@ public class CaptchaController {
                      @VField(label = "ymp.module.captcha.field.captcha")
                      @RequestParam String captcha,
 
-                     @VRequired @VLength(max = 32) @RequestParam String scope,
+                     @VRequired @VLength(max = 64) @RequestParam String scope,
 
                      @VRequired @VMobile @RequestParam String mobile) throws Exception {
 
@@ -137,7 +137,7 @@ public class CaptchaController {
                       @VField(label = "ymp.module.captcha.field.captcha")
                       @RequestParam String captcha,
 
-                      @VRequired @VLength(max = 32) @RequestParam String scope,
+                      @VRequired @VLength(max = 64) @RequestParam String scope,
 
                       @VRequired @VEmail @RequestParam String email) throws Exception {
 
@@ -153,11 +153,11 @@ public class CaptchaController {
      */
     @RequestMapping(value = "/match", method = {Type.HttpMethod.GET, Type.HttpMethod.POST})
     @CaptchaStatusCheck
-    public IView match(@VRequired @VLength(max = 32) @RequestParam String scope,
+    public IView match(@VRequired @VLength(max = 64) @RequestParam String scope,
 
-                       @VLength(max = 50) @RequestParam String target,
+                       @RequestParam String target,
 
-                       @VRequired @VLength(max = 10) @RequestParam String token) throws Exception {
+                       @VRequired @RequestParam String token) throws Exception {
 
         return WebResult.builder().succeed().dataAttr("matched", ICaptcha.Status.MATCHED.equals(captcha.validate(scope, target, token, false))).build().withContentType().toJsonView();
     }
