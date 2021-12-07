@@ -81,7 +81,7 @@ public final class Captcha implements IModule, ICaptcha {
     public void initialize(IApplication owner) throws Exception {
         if (!initialized) {
             //
-            YMP.showVersion("Initializing ymate-module-captcha-${version}", new Version(2, 0, 0, Captcha.class, Version.VersionType.Alpha));
+            YMP.showVersion("Initializing ymate-module-captcha-${version}", new Version(2, 0, 0, Captcha.class, Version.VersionType.Release));
             //
             this.owner = owner;
             if (config == null) {
