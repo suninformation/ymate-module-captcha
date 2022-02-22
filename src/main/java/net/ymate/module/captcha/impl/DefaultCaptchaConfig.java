@@ -19,6 +19,7 @@ import com.github.cage.image.Painter;
 import net.ymate.module.captcha.*;
 import net.ymate.module.captcha.annotation.CaptchaConf;
 import net.ymate.platform.commons.lang.BlurObject;
+import net.ymate.platform.commons.util.ClassUtils;
 import net.ymate.platform.core.configuration.IConfigReader;
 import net.ymate.platform.core.module.IModuleConfigurer;
 import org.apache.commons.lang.NullArgumentException;
@@ -198,30 +199,37 @@ public final class DefaultCaptchaConfig implements ICaptchaConfig {
         if (!initialized) {
             if (enabled) {
                 if (captchaProvider == null) {
-                    captchaProvider = new DefaultCaptchaProvider();
+                    captchaProvider = ClassUtils.loadClass(ICaptchaProvider.class, DefaultCaptchaProvider.class);
                 }
                 captchaProvider.initialize(owner);
                 //
                 if (storageAdapter == null) {
-                    storageAdapter = new DefaultCaptchaStorageAdapter();
+                    storageAdapter = ClassUtils.loadClass(ICaptchaStorageAdapter.class, DefaultCaptchaStorageAdapter.class);
                 }
                 storageAdapter.initialize(owner);
                 //
+                if (tokenGenerator == null) {
+                    tokenGenerator = ClassUtils.loadClass(ICaptchaTokenGenerator.class);
+                }
                 if (tokenGenerator != null) {
                     tokenGenerator.initialize(owner);
                 }
                 if (sendProvider == null) {
-                    sendProvider = new DefaultCaptchaSendProvider();
+                    sendProvider = ClassUtils.loadClass(ICaptchaSendProvider.class, DefaultCaptchaSendProvider.class);
                 }
                 sendProvider.initialize(owner);
+                //
+                if (scopeProcessor == null) {
+                    scopeProcessor = ClassUtils.loadClass(ICaptchaScopeProcessor.class);
+                }
+                if (scopeProcessor != null) {
+                    scopeProcessor.initialize(owner);
+                }
                 //
                 if (needCaptchaWrongTimes < 0) {
                     needCaptchaWrongTimes = 0;
                 } else if (needCaptchaWrongTimes > 0 && scopeProcessor == null) {
                     throw new NullArgumentException(SCOPE_PROCESSOR_CLASS);
-                }
-                if (scopeProcessor != null) {
-                    scopeProcessor.initialize(owner);
                 }
             }
             initialized = true;
